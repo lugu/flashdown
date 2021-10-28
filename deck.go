@@ -41,7 +41,7 @@ func (d *Deck) MetaFilename() string {
 }
 
 // DeckSuccess returns the nubmer of success in the deck.
-func DeckSuccessNb(d Deck) int {
+func (d *Deck) DeckSuccessNb() int {
 	var success int
 	for _, card := range d.Cards {
 		if card.Meta.Repetition > 0 {

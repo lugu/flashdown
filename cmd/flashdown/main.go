@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
@@ -47,6 +46,8 @@ var (
 
 	helpIndex  = 0
 	helpAnswer = helpAnswers[helpIndex]
+
+	game *flashdown.Game
 )
 
 func main() {
@@ -62,8 +63,8 @@ func main() {
 	}
 
 	forceAllCards := false
-	var success, total int
-	cards := make([]flashdown.Card, 0)
+	decks := make([]flashdown.Deck, 0, len(os.Args))
+
 	for i := 1; i < len(os.Args); i++ {
 		if os.Args[i] == "-a" {
 			forceAllCards = true
@@ -73,21 +74,14 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer flashdown.SaveDeckMeta(deck)
-		if forceAllCards {
-			cards = append(cards, deck.Cards...)
-		} else {
-			cards = append(cards, deck.SelectBefore(time.Now())...)
-		}
-		success += flashdown.DeckSuccessNb(deck)
-		total += len(deck.Cards)
+		decks = append(decks, deck)
 	}
 
-	if len(cards) == 0 {
+	game = flashdown.NewGame(forceAllCards, decks)
+	if game.IsFinished() {
 		return
 	}
-	cards = flashdown.ShuffleCards(cards)
-	index := 0
+	defer game.Save()
 
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
@@ -120,38 +114,32 @@ func main() {
 	)
 
 	updateTitle := func() {
-		percent := (float32(success) / float32(total)) * 100
+		percent := game.Success()
+		current, total := game.Progress()
 		q.Title = fmt.Sprintf(`Card: %d/%d — Success %2.0f%%`,
-			index+1, len(cards), percent)
+			current, total, percent)
 	}
 
-	ask := func(c flashdown.Card) {
+	ask := func() {
 		updateTitle()
-		q.Text = c.Question
+		q.Text = game.Question()
 		a.Text = ""
 		help.Text = helpQuestion
 		ui.Clear()
 		ui.Render(grid, help)
 	}
 	review := func(i int) {
-		if i >= 3 {
-			success++
-		}
-		cards[index].Review(flashdown.Score(i))
-		index++
-		if index >= len(cards) {
-			return
-		}
-		ask(cards[index])
+		game.Review(flashdown.Score(i))
+		ask()
 	}
-	answer := func(c flashdown.Card) {
-		q.Text = c.Question
-		a.Text = c.Answer
+	answer := func() {
+		q.Text = game.Question()
+		a.Text = game.Answer()
 		help.Text = helpAnswer
 		ui.Clear()
 		ui.Render(grid, help)
 	}
-	ask(cards[index])
+	ask()
 
 	resize := func(width, height int) {
 		help.Text = helpAnswer
@@ -171,11 +159,11 @@ func main() {
 		case e := <-uiEvents:
 			switch e.ID {
 			case "s":
-				index++
-				if index >= len(cards) {
+				game.Skip()
+				if game.IsFinished() {
 					return
 				}
-				ask(cards[index])
+				ask()
 			case "q", "<C-c>":
 				return
 			case "h":
@@ -187,7 +175,7 @@ func main() {
 				payload := e.Payload.(ui.Resize)
 				resize(payload.Width, payload.Height)
 			case "<Space>", "<Enter>":
-				answer(cards[index])
+				answer()
 			case "0":
 				review(0)
 			case "1":
@@ -202,7 +190,7 @@ func main() {
 				review(5)
 			}
 		}
-		if index >= len(cards) {
+		if game.IsFinished() {
 			break
 		}
 	}

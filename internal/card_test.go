@@ -1,4 +1,4 @@
-package flashdown
+package internal
 
 import (
 	"bytes"
@@ -48,4 +48,3 @@ func TestSplitDeck(t *testing.T) {
 		}
 	}
 }
-

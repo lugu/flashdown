@@ -1,4 +1,4 @@
-package flashdown
+package internal
 
 import (
 	"math/rand"
@@ -92,7 +92,7 @@ func OpenDeck(filename string) (d Deck, err error) {
 	return d, nil
 }
 
-func SaveDeckMeta(d Deck) error {
+func (d *Deck) SaveDeckMeta() error {
 	metas := make([]Meta, len(d.Cards))
 	for i, _ := range d.Cards {
 		metas[i] = *d.Cards[i].Meta

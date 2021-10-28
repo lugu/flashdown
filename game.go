@@ -1,22 +1,31 @@
 package flashdown
 
-import "time"
+import (
+	"time"
+
+	"github.com/lugu/flashdown/internal"
+)
 
 type Game struct {
-	cards    []Card
-	decks    []Deck
+	cards    []internal.Card
+	decks    []internal.Deck
 	index    int
 	success  int
 	total    int
 	finished bool
 }
 
-func NewGame(forceAllCards bool, decks []Deck) *Game {
+// NewGame returns a game given a set of markdown files.
+func NewGame(forceAllCards bool, files []string) (*Game, error) {
 	game := &Game{
-		cards: make([]Card, 0),
-		decks: make([]Deck, len(decks)),
+		cards: make([]internal.Card, 0),
+		decks: make([]internal.Deck, len(files)),
 	}
-	for i, deck := range decks {
+	for i, file := range files {
+		deck, err := internal.OpenDeck(file)
+		if err != nil {
+			return nil, err
+		}
 		if forceAllCards {
 			game.cards = append(game.cards, deck.Cards...)
 		} else {
@@ -25,9 +34,9 @@ func NewGame(forceAllCards bool, decks []Deck) *Game {
 		game.success += deck.DeckSuccessNb()
 		game.decks[i] = deck
 	}
-	game.cards = ShuffleCards(game.cards)
+	game.cards = internal.ShuffleCards(game.cards)
 	game.total = len(game.cards)
-	return game
+	return game, nil
 }
 
 func (g *Game) Question() string {
@@ -44,12 +53,30 @@ func (g *Game) Answer() string {
 	return g.cards[g.index].Answer
 }
 
+// Score represents how easly one responded to a question.
+type Score int
+
+const (
+	// 0: Total blackout, complete failure to recall the information.
+	TotalBlackout Score = 0
+	// 1: Incorrect response, but upon seeing the correct answer it felt familiar.
+	IncorrectDifficult Score = iota
+	// 2: Incorrect response, but upon seeing the correct answer it seemed easy to remember.
+	IncorrectEasy Score = iota
+	// 3: Correct response, but required significant difficulty to recall.
+	CorrectDifficult Score = iota
+	// 4: Correct response, after some hesitation.
+	CorrectEasy Score = iota
+	// 5: Correct response with perfect recall.
+	PerfectRecall Score = iota
+)
+
 func (g *Game) Review(s Score) {
 	if g.index < len(g.cards) {
 		if s >= 3 {
 			g.success++
 		}
-		g.cards[g.index].Meta.Review(s)
+		g.cards[g.index].Meta.Review(internal.Score(s))
 		g.index++
 	}
 	if g.index == len(g.cards) {
@@ -68,11 +95,14 @@ func (g *Game) Skip() {
 	}
 }
 
-func (g *Game) Progress() (index, total int) {
+func (g *Game) Progress() (current, total int) {
 	return g.index + 1, g.total
 }
 
 func (g *Game) Success() float32 {
+	if g.total == 0 {
+		return 100
+	}
 	return (float32(g.success) / float32(g.total)) * 100
 }
 
@@ -82,6 +112,6 @@ func (g *Game) IsFinished() bool {
 
 func (g *Game) Save() {
 	for _, d := range g.decks {
-		defer SaveDeckMeta(d)
+		defer d.SaveDeckMeta()
 	}
 }

@@ -1,4 +1,4 @@
-package flashdown
+package internal
 
 import (
 	"bytes"

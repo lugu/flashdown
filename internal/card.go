@@ -1,4 +1,4 @@
-package flashdown
+package internal
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 var (
 	errNoteEmpty       = errors.New("Empty note")
 	errQuestionMissing = errors.New("Missing question")
-	errInvalidCard    = errors.New("Invalid card")
+	errInvalidCard     = errors.New("Invalid card")
 )
 
 var (
@@ -64,16 +64,16 @@ func trim(s string) string {
 // loadCard parse a card description
 func loadCard(md string) (c Card, err error) {
 
-    md = trim(md)
-    if md == "" {
-	return c, errNoteEmpty
-    }
-    sheets := strings.SplitN(md, "\n", 2)
-    if len(sheets) != 2 {
-	return c, errInvalidCard
-    }
-    c.Question = trim(sheets[0])
-    c.Answer = trim(sheets[1])
-    c.Meta = NewMeta(Hash(c))
-    return c, nil
+	md = trim(md)
+	if md == "" {
+		return c, errNoteEmpty
+	}
+	sheets := strings.SplitN(md, "\n", 2)
+	if len(sheets) != 2 {
+		return c, errInvalidCard
+	}
+	c.Question = trim(sheets[0])
+	c.Answer = trim(sheets[1])
+	c.Meta = NewMeta(Hash(c))
+	return c, nil
 }

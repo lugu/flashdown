@@ -63,21 +63,20 @@ func main() {
 	}
 
 	forceAllCards := false
-	decks := make([]flashdown.Deck, 0, len(os.Args))
+	files := make([]string, 0, len(os.Args))
 
 	for i := 1; i < len(os.Args); i++ {
 		if os.Args[i] == "-a" {
 			forceAllCards = true
 			continue
 		}
-		deck, err := flashdown.OpenDeck(os.Args[i])
-		if err != nil {
-			log.Fatal(err)
-		}
-		decks = append(decks, deck)
+		files = append(files, os.Args[i])
 	}
 
-	game = flashdown.NewGame(forceAllCards, decks)
+	game, err := flashdown.NewGame(forceAllCards, files)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if game.IsFinished() {
 		return
 	}
@@ -128,8 +127,8 @@ func main() {
 		ui.Clear()
 		ui.Render(grid, help)
 	}
-	review := func(i int) {
-		game.Review(flashdown.Score(i))
+	review := func(score flashdown.Score) {
+		game.Review(score)
 		ask()
 	}
 	answer := func() {
@@ -177,17 +176,17 @@ func main() {
 			case "<Space>", "<Enter>":
 				answer()
 			case "0":
-				review(0)
+				review(flashdown.TotalBlackout)
 			case "1":
-				review(1)
+				review(flashdown.IncorrectDifficult)
 			case "2":
-				review(2)
+				review(flashdown.IncorrectEasy)
 			case "3":
-				review(3)
+				review(flashdown.CorrectDifficult)
 			case "4":
-				review(4)
+				review(flashdown.CorrectEasy)
 			case "5":
-				review(5)
+				review(flashdown.PerfectRecall)
 			}
 		}
 		if game.IsFinished() {

@@ -2,7 +2,6 @@ package internal
 
 import (
 	"math/rand"
-	"os"
 	"path/filepath"
 	"time"
 )
@@ -33,6 +32,9 @@ func (d *Deck) SelectBefore(now time.Time) []Card {
 	return cards
 }
 
+// MetaFilename returns the location of the meta file.
+// BUG: on Android the URI is not correctly constructed for content: URI and if
+// it was it would points to a non writable path.
 func (d *Deck) MetaFilename() string {
 	base := filepath.Base(d.Filename)
 	base = "." + base + ".db"
@@ -54,10 +56,11 @@ func (d *Deck) DeckSuccessNb() int {
 // OpenDeck reads a Deck from disk
 func OpenDeck(filename string) (d Deck, err error) {
 
-	file, err := os.Open(filename)
+	file, err := OpenReader(filename)
 	if err != nil {
 		return d, err
 	}
+	defer file.Close()
 	d.Filename = filename
 	d.Cards, err = readCards(file)
 	if err != nil {
@@ -68,17 +71,12 @@ func OpenDeck(filename string) (d Deck, err error) {
 	metaMap, err := OpenDB(metaFilename)
 	if err != nil {
 		// create an empty DB if it is missing
-		_, errorMissing := os.Stat(metaFilename)
-		if os.IsNotExist(errorMissing) {
-			file, err := os.Create(metaFilename)
-			if err != nil {
-				return d, err
-			}
-			file.Close()
-			metaMap = make(map[Digest]*Meta)
-		} else {
+		file, err := CreateWriter(metaFilename)
+		if err != nil {
 			return d, err
 		}
+		file.Close()
+		metaMap = make(map[Digest]*Meta)
 	}
 	for i, _ := range d.Cards {
 		hash := Hash(d.Cards[i])
@@ -97,9 +95,10 @@ func (d *Deck) SaveDeckMeta() error {
 	for i, _ := range d.Cards {
 		metas[i] = *d.Cards[i].Meta
 	}
-	w, err := os.Create(d.MetaFilename())
+	w, err := CreateWriter(d.MetaFilename())
 	if err != nil {
 		return err
 	}
+	defer w.Close()
 	return writeDB(w, metas)
 }

@@ -6,7 +6,6 @@ import (
 	"hash/fnv"
 	"io"
 	"io/ioutil"
-	"os"
 	"strings"
 	"time"
 )
@@ -100,10 +99,11 @@ func Hash(card Card) Digest {
 // OpenDB opens a meta data file. If the file does not exists it creates an
 // empty file and returns an empty map.
 func OpenDB(filename string) (map[Digest]*Meta, error) {
-	f, err := os.Open(filename)
+	f, err := OpenReader(filename)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	metas, err := readDB(f)
 	if err != nil {
 		return nil, err

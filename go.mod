@@ -3,10 +3,10 @@ module github.com/lugu/flashdown
 go 1.15
 
 require (
-	fyne.io/fyne/v2 v2.1.1 // indirect
+	fyne.io/fyne/v2 v2.1.2-0.20211031121846-729a47831729
 	github.com/MichaelMure/go-term-markdown v0.1.3
-	github.com/aarzilli/nucular v0.0.0-20210408133902-d3dd7b05a80a // indirect
-	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
+	github.com/aarzilli/nucular v0.0.0-20210408133902-d3dd7b05a80a
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/fatih/color v1.9.0
 	github.com/gizak/termui/v3 v3.1.0
 	github.com/gomarkdown/markdown v0.0.0-20201113031856-722100d81a8e // indirect
@@ -15,3 +15,6 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20210114135735-d04385b850e8 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 )
+
+// replace fyne.io/fyne/v2 => github.com/lugu/fyne/v2 develop
+replace fyne.io/fyne/v2 => github.com/lugu/fyne/v2 v2.1.2-0.20211104170818-7d8328f0dcd0

@@ -107,6 +107,9 @@ func (g *Game) Success() float32 {
 }
 
 func (g *Game) IsFinished() bool {
+	if len(g.cards) == 0 {
+		return true
+	}
 	return g.finished
 }
 
@@ -114,4 +117,15 @@ func (g *Game) Save() {
 	for _, d := range g.decks {
 		defer d.SaveDeckMeta()
 	}
+}
+
+func (g *Game) Name() string {
+	name := ""
+	for i, d := range g.decks {
+		if i != 0 {
+			name = name + " "
+		}
+		name = name + d.Filename
+	}
+	return name
 }

@@ -2,31 +2,55 @@ package flashdown
 
 import (
 	"time"
-
-	"github.com/lugu/flashdown/internal"
 )
 
+// Game represents a learning session.
 type Game struct {
-	cards    []internal.Card
-	decks    []internal.Deck
+	cards    []Card
+	decks    []*Deck
+	name     string
 	index    int
 	success  int
 	total    int
 	finished bool
 }
 
-// NewGame returns a game given a set of markdown files.
-func NewGame(forceAllCards bool, files []string) (*Game, error) {
-	game := &Game{
-		cards: make([]internal.Card, 0),
-		decks: make([]internal.Deck, len(files)),
-	}
+// NewGameFromFiles reads the markdown files to instantiate a Game.
+func NewGameFromFiles(useAllCards bool, files []string) (*Game, error) {
+	decks := make([]*Deck, len(files))
+	name := ""
 	for i, file := range files {
-		deck, err := internal.OpenDeck(file)
+		deck, err := NewDeckFromFile(file)
 		if err != nil {
 			return nil, err
 		}
-		if forceAllCards {
+		decks[i] = deck
+		if i != 0 {
+			name = name + " "
+		}
+		name = name + file
+	}
+	return NewGame(name, useAllCards, decks)
+}
+
+// NewGameFromFiles reads the markdown files to instantiate a Game.
+func NewGameFromAccessor(name string, accessor DeckAccessor) (*Game, error) {
+	deck, err := NewDeck(accessor)
+	if err != nil {
+		return nil, err
+	}
+	return NewGame(name, false, []*Deck{deck})
+}
+
+// NewGame returns a game given a set of markdown files.
+func NewGame(name string, useAllCards bool, decks []*Deck) (*Game, error) {
+	game := &Game{
+		cards: make([]Card, 0),
+		decks: decks,
+		name:  name,
+	}
+	for i, deck := range decks {
+		if useAllCards {
 			game.cards = append(game.cards, deck.Cards...)
 		} else {
 			game.cards = append(game.cards, deck.SelectBefore(time.Now())...)
@@ -34,11 +58,12 @@ func NewGame(forceAllCards bool, files []string) (*Game, error) {
 		game.success += deck.DeckSuccessNb()
 		game.decks[i] = deck
 	}
-	game.cards = internal.ShuffleCards(game.cards)
+	game.cards = ShuffleCards(game.cards)
 	game.total = len(game.cards)
 	return game, nil
 }
 
+// Question returns the next question to answer. Idempotent.
 func (g *Game) Question() string {
 	if len(g.cards) == 0 {
 		return "No cards"
@@ -46,6 +71,7 @@ func (g *Game) Question() string {
 	return g.cards[g.index].Question
 }
 
+// Question returns the next question to answer. Idempotent.
 func (g *Game) Answer() string {
 	if len(g.cards) == 0 {
 		return "No cards"
@@ -76,7 +102,7 @@ func (g *Game) Review(s Score) {
 		if s >= 3 {
 			g.success++
 		}
-		g.cards[g.index].Meta.Review(internal.Score(s))
+		g.cards[g.index].Meta.Review(s)
 		g.index++
 	}
 	if g.index == len(g.cards) {
@@ -120,12 +146,5 @@ func (g *Game) Save() {
 }
 
 func (g *Game) Name() string {
-	name := ""
-	for i, d := range g.decks {
-		if i != 0 {
-			name = name + " "
-		}
-		name = name + d.Filename
-	}
-	return name
+	return g.name
 }

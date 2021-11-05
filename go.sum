@@ -84,6 +84,10 @@ github.com/lugu/fyne/v2 v2.1.2-0.20211103235843-368917da32a4 h1:0hf6X9hy7O1nIg9o
 github.com/lugu/fyne/v2 v2.1.2-0.20211103235843-368917da32a4/go.mod h1:mddyAvGLDbbRmECVVSdZsf6oquUyn5QqPYRim0O7aPA=
 github.com/lugu/fyne/v2 v2.1.2-0.20211104170818-7d8328f0dcd0 h1:dmmR2psYFHn6XrSsdDQ15TfWzesblJc9XnXkvY3x7L4=
 github.com/lugu/fyne/v2 v2.1.2-0.20211104170818-7d8328f0dcd0/go.mod h1:c1vwI38Ebd0dAdxVa6H1Pj6/+cK1xtDy61+I31g+s14=
+github.com/lugu/fyne/v2 v2.1.2-0.20211105175309-ced5219d1ba4 h1:ABu1IX7NZ7pWGH22yLQgkuv4mbcqyPDAEUDFVLVMh9E=
+github.com/lugu/fyne/v2 v2.1.2-0.20211105175309-ced5219d1ba4/go.mod h1:mddyAvGLDbbRmECVVSdZsf6oquUyn5QqPYRim0O7aPA=
+github.com/lugu/fyne/v2 v2.1.2-0.20211105180119-8b8e52e0b3a3 h1:/si033zQpi1LF6wCJnv0aEMcx7ik3t4J4aND//8chr8=
+github.com/lugu/fyne/v2 v2.1.2-0.20211105180119-8b8e52e0b3a3/go.mod h1:mddyAvGLDbbRmECVVSdZsf6oquUyn5QqPYRim0O7aPA=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=

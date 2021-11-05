@@ -1,4 +1,4 @@
-package internal
+package flashdown
 
 import (
 	"encoding/json"
@@ -10,18 +10,7 @@ import (
 	"time"
 )
 
-// Score represents how easly one responded to a question.
-//
-// 5: Correct response with perfect recall.
-// 4: Correct response, after some hesitation.
-// 3: Correct response, but required significant difficulty to recall.
-// 2: Incorrect response, but upon seeing the correct answer it seemed easy to remember.
-// 1: Incorrect response, but upon seeing the correct answer it felt familiar.
-// 0: "Total blackout", complete failure to recall the information.
-type Score int
-
 // Digest represents the question digest.
-// FIXME: not sure what to use here...
 type Digest uint64
 
 const (
@@ -96,21 +85,6 @@ func Hash(card Card) Digest {
 	return Digest(h.Sum64())
 }
 
-// OpenDB opens a meta data file. If the file does not exists it creates an
-// empty file and returns an empty map.
-func OpenDB(filename string) (map[Digest]*Meta, error) {
-	f, err := OpenReader(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	metas, err := readDB(f)
-	if err != nil {
-		return nil, err
-	}
-	return metaMap(metas), nil
-}
-
 func readDB(r io.Reader) ([]Meta, error) {
 	metas := make([]Meta, 0)
 	bytes, err := ioutil.ReadAll(r)
@@ -134,13 +108,4 @@ func writeDB(w io.Writer, metas []Meta) error {
 		return err
 	}
 	return nil
-}
-
-func metaMap(metas []Meta) map[Digest]*Meta {
-
-	metaMap := make(map[Digest]*Meta)
-	for i, meta := range metas {
-		metaMap[meta.Hash] = &metas[i]
-	}
-	return metaMap
 }

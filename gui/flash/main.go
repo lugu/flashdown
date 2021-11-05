@@ -1,10 +1,10 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"image/color"
 	"io"
-	"log"
 	"net/url"
 	"path"
 
@@ -18,34 +18,34 @@ import (
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/lugu/flashdown"
-	"github.com/lugu/flashdown/internal"
 )
 
-func init() {
-	internal.OpenReader = func(name string) (io.ReadCloser, error) {
-		uri, err := storage.ParseURI(name)
-		if err != nil {
-			return nil, fmt.Errorf("URI %s: %v", name, err)
-		}
-		r, err := storage.Reader(uri)
-		if err != nil {
-			err = fmt.Errorf("Failed to read %s: %v", name, err)
-			log.Printf("OpenReader: %s", err)
-		}
-		return r, err
+// uriDeckAccessor must implement flashdown.DeckAccessor
+var _ flashdown.DeckAccessor = (*uriDeckAccessor)(nil)
+
+type uriDeckAccessor struct {
+	deck fyne.URI
+	db   fyne.URI
+}
+
+func (u *uriDeckAccessor) CardsReader() (io.ReadCloser, error) {
+	return storage.Reader(u.deck)
+}
+
+func (u *uriDeckAccessor) MetaReader() (io.ReadCloser, error) {
+	r, err := storage.Reader(u.db)
+	if err != nil {
+		return nil, err
 	}
-	internal.CreateWriter = func(name string) (io.WriteCloser, error) {
-		uri, err := storage.ParseURI(name)
-		if err != nil {
-			return nil, fmt.Errorf("URI %s: %v", name, err)
-		}
-		w, err := storage.Writer(uri)
-		if err != nil {
-			err = fmt.Errorf("Failed to create %s: %v", name, err)
-			log.Printf("CreateWriter: %s", err)
-		}
-		return w, err
+	return r, err
+}
+
+func (u *uriDeckAccessor) MetaWriter() (io.WriteCloser, error) {
+	w, err := storage.Writer(u.db)
+	if err != nil {
+		return nil, err
 	}
+	return w, err
 }
 
 // directoryURI return the location where to look for decks.
@@ -61,7 +61,7 @@ func directoryURI() fyne.URI {
 	return uri
 }
 
-func setdirectoryURI(dir fyne.URI) {
+func setDirectoryURI(dir fyne.URI) {
 	prefs := fyne.CurrentApp().Preferences()
 	prefs.SetString("directory", dir.String())
 }
@@ -204,8 +204,8 @@ func forHuman(f fyne.URI) string {
 	return file
 }
 
-func newSelectDirectory(window fyne.Window) *fyne.Container {
-	dirText := fmt.Sprintf("Directory: %s", forHuman(directoryURI()))
+func newSelectDirectory(dir fyne.URI, window fyne.Window) *fyne.Container {
+	dirText := fmt.Sprintf("Directory: %s", forHuman(dir))
 	dirLabel := widget.NewLabel(dirText)
 	dirLabel.Wrapping = fyne.TextWrapBreak
 	dirChange := widget.NewButton("Change directory", func() {
@@ -215,8 +215,8 @@ func newSelectDirectory(window fyne.Window) *fyne.Container {
 				return
 			}
 			if d != nil {
-				if d.String() != directoryURI().String() {
-					setdirectoryURI(d)
+				if d.String() != dir.String() {
+					setDirectoryURI(d)
 				}
 				WelcomeScreen(window)
 			}
@@ -228,31 +228,50 @@ func newSelectDirectory(window fyne.Window) *fyne.Container {
 
 // getFiles returns the list of decks inside the given directory.
 // getFiles returns an error if it does not any deck.
-func getFiles(dir fyne.URI) ([]string, error) {
+func getFiles(dir fyne.URI) ([]fyne.URI, error) {
 
-	files := []string{}
-	if dir == nil {
-		return nil, fmt.Errorf("Nil directory")
-	}
-
+	files := []fyne.URI{}
 	childs, err := storage.List(dir)
 	if err != nil {
 		return nil, fmt.Errorf("List %s: %v", forHuman(dir), err)
 	}
 	filter := storage.NewExtensionFileFilter([]string{".md"})
 	for _, child := range childs {
-
 		if child == nil {
 			continue
 		}
 		if filter.Matches(child) {
-			files = append(files, child.String())
+			files = append(files, child)
 		}
 	}
 	if len(files) == 0 {
 		return nil, fmt.Errorf("No deck found in: %s", forHuman(dir))
 	}
 	return files, nil
+}
+
+func dbFile(file fyne.URI) (fyne.URI, error) {
+	a := fyne.CurrentApp()
+
+	md5 := md5.Sum([]byte(file.String()))
+	name := fmt.Sprintf("%x\n", md5)
+
+	db, err := a.Storage().Open(name)
+	if err != nil {
+		db, err := a.Storage().Create(name)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to open db: %s", err)
+		}
+		defer db.Close()
+		w, err := storage.Writer(db.URI())
+		if err != nil {
+			return nil, fmt.Errorf("Failed to open reader: %s", err)
+		}
+		defer w.Close()
+		return db.URI(), nil
+	}
+	defer db.Close()
+	return db.URI(), nil
 }
 
 func loadGames(dir fyne.URI) ([]*flashdown.Game, error) {
@@ -264,7 +283,16 @@ func loadGames(dir fyne.URI) ([]*flashdown.Game, error) {
 	// Create a list of games just to print the current progress.
 	games := make([]*flashdown.Game, len(files))
 	for i, f := range files {
-		games[i], err = flashdown.NewGame(false, []string{f})
+		db, err := dbFile(f)
+		if err != nil {
+			return nil, err
+		}
+		acc := &uriDeckAccessor{
+			deck: f,
+			db:   db,
+		}
+
+		games[i], err = flashdown.NewGameFromAccessor(f.Name(), acc)
 		if err != nil {
 			return nil, err
 		}
@@ -273,16 +301,18 @@ func loadGames(dir fyne.URI) ([]*flashdown.Game, error) {
 }
 
 func WelcomeScreen(window fyne.Window) {
-	directory := newSelectDirectory(window)
+	directory := directoryURI()
+	topBar := newSelectDirectory(directory, window)
 
-	games, err := loadGames(directoryURI())
+	games, err := loadGames(directory)
 	if err != nil {
-		directory := newSelectDirectory(window)
+		topBar := newSelectDirectory(directory, window)
 		errLabel := widget.NewLabel(err.Error())
 		errLabel.Wrapping = fyne.TextWrapBreak
 		vbox := container.New(layout.NewVBoxLayout(),
-			directory, layout.NewSpacer(), errLabel)
+			topBar, layout.NewSpacer(), errLabel)
 		window.SetContent(vbox)
+		return
 	}
 
 	gameList := widget.NewList(
@@ -308,7 +338,7 @@ func WelcomeScreen(window fyne.Window) {
 		})
 
 	window.SetContent(container.New(layout.NewBorderLayout(
-		directory, nil, nil, nil), directory, gameList))
+		topBar, nil, nil, nil), topBar, gameList))
 }
 
 func main() {

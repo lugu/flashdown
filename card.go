@@ -1,4 +1,4 @@
-package internal
+package flashdown
 
 import (
 	"errors"
@@ -33,7 +33,7 @@ func splitCards(md string) []string {
 	return splitQuestion.Split(md, -1)
 }
 
-func loadCards(md string) ([]Card, error) {
+func parseCards(md string) ([]Card, error) {
 	cards := make([]Card, 0)
 
 	sheets := splitCards(md)
@@ -54,7 +54,7 @@ func readCards(r io.Reader) ([]Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	return loadCards(string(dat))
+	return parseCards(string(dat))
 }
 
 func trim(s string) string {

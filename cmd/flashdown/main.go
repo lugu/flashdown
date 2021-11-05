@@ -62,18 +62,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	forceAllCards := false
+	userAllCards := false
 	files := make([]string, 0, len(os.Args))
 
 	for i := 1; i < len(os.Args); i++ {
 		if os.Args[i] == "-a" {
-			forceAllCards = true
+			userAllCards = true
 			continue
 		}
 		files = append(files, os.Args[i])
 	}
 
-	game, err := flashdown.NewGame(forceAllCards, files)
+	game, err := flashdown.NewGameFromFiles(userAllCards, files)
 	if err != nil {
 		log.Fatal(err)
 	}

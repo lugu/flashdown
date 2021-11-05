@@ -1,10 +1,10 @@
 package main
 
 import (
-	"crypto/md5"
 	"fmt"
 	"image/color"
 	"io"
+	"io/ioutil"
 	"net/url"
 	"path"
 
@@ -204,109 +204,140 @@ func forHuman(f fyne.URI) string {
 	return file
 }
 
-func newSelectDirectory(dir fyne.URI, window fyne.Window) *fyne.Container {
-	dirText := fmt.Sprintf("Directory: %s", forHuman(dir))
-	dirLabel := widget.NewLabel(dirText)
-	dirLabel.Wrapping = fyne.TextWrapBreak
-	dirChange := widget.NewButton("Change directory", func() {
-		dialog.NewFolderOpen(func(d fyne.ListableURI, err error) {
-			if err != nil {
-				ErrorScreen(window, err)
-				return
-			}
-			if d != nil {
-				if d.String() != dir.String() {
-					setDirectoryURI(d)
-				}
-				WelcomeScreen(window)
-			}
-		}, window).Show()
-	})
-	return container.New(layout.NewBorderLayout(nil, nil, nil,
-		dirChange), dirChange, dirLabel)
-}
-
-// getFiles returns the list of decks inside the given directory.
-// getFiles returns an error if it does not any deck.
-func getFiles(dir fyne.URI) ([]fyne.URI, error) {
-
-	files := []fyne.URI{}
-	childs, err := storage.List(dir)
-	if err != nil {
-		return nil, fmt.Errorf("List %s: %v", forHuman(dir), err)
-	}
-	filter := storage.NewExtensionFileFilter([]string{".md"})
-	for _, child := range childs {
-		if child == nil {
+func cleanUpStorage() {
+	a := fyne.CurrentApp()
+	root := a.Storage()
+	names := root.List()
+	for _, name := range names {
+		child, err := root.Open(name)
+		if err != nil {
 			continue
 		}
-		if filter.Matches(child) {
-			files = append(files, child)
+		defer child.Close()
+		file := child.URI()
+		if file.Extension() == ".md" {
+			root.Remove(name)
 		}
 	}
-	if len(files) == 0 {
-		return nil, fmt.Errorf("No deck found in: %s", forHuman(dir))
+}
+
+func importFile(source fyne.URI) error {
+	reader, err := storage.Reader(source)
+	if err != nil {
+		return nil
 	}
-	return files, nil
+	defer reader.Close()
+	bytes, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return fmt.Errorf("Failed to read file: %s, %s",
+			forHuman(source), err)
+	}
+
+	a := fyne.CurrentApp()
+	root := a.Storage()
+
+	decoded, err := url.PathUnescape(source.Name())
+	filename := path.Base(decoded)
+
+	writer, err := root.Create(filename)
+	if err != nil {
+		return fmt.Errorf("Failed to create file: %s, %s",
+			source.Name(), err)
+	}
+	defer writer.Close()
+
+	n, err := writer.Write(bytes)
+	if n != len(bytes) {
+		return fmt.Errorf("Partial copy: %d/%d bytes", n, len(bytes))
+	}
+	return nil
+}
+
+func importDirectory(directory fyne.ListableURI) error {
+	files, err := directory.List()
+	if err != nil {
+		return err
+	}
+	cleanUpStorage()
+	for _, file := range files {
+		if file.Extension() != ".md" {
+			continue
+		}
+		err = importFile(file)
+		if err != nil {
+			return fmt.Errorf("Cannot import %s: %s", file.String(), err)
+		}
+	}
+	return nil
+}
+
+func importDirectoryButton(window fyne.Window) *widget.Button {
+	importCallback := func(d fyne.ListableURI, err error) {
+		if err != nil {
+			ErrorScreen(window, err)
+			return
+		}
+		if d == nil {
+			return
+		}
+		if err = importDirectory(d); err != nil {
+			ErrorScreen(window, err)
+			return
+		}
+		WelcomeScreen(window)
+	}
+	button := widget.NewButton("Import Directory", func() {
+		dialog.NewFolderOpen(importCallback, window).Show()
+	})
+	return button
 }
 
 func dbFile(file fyne.URI) (fyne.URI, error) {
-	a := fyne.CurrentApp()
-
-	md5 := md5.Sum([]byte(file.String()))
-	name := fmt.Sprintf("%x\n", md5)
-
-	db, err := a.Storage().Open(name)
-	if err != nil {
-		db, err := a.Storage().Create(name)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to open db: %s", err)
-		}
-		defer db.Close()
-		w, err := storage.Writer(db.URI())
-		if err != nil {
-			return nil, fmt.Errorf("Failed to open reader: %s", err)
-		}
-		defer w.Close()
-		return db.URI(), nil
-	}
-	defer db.Close()
-	return db.URI(), nil
+	return storage.ParseURI(file.String() + ".db")
 }
 
-func loadGames(dir fyne.URI) ([]*flashdown.Game, error) {
-	files, err := getFiles(dir)
-	if err != nil {
-		return nil, err
+func loadGames() ([]*flashdown.Game, error) {
+	games := make([]*flashdown.Game, 0)
+
+	a := fyne.CurrentApp()
+	root := a.Storage()
+
+	for _, name := range root.List() {
+		child, err := root.Open(name)
+		if err != nil {
+			continue
+		}
+		defer child.Close()
+		file := child.URI()
+		if file.Extension() != ".md" {
+			continue
+		}
+
+		db, err := dbFile(file)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create URI: %s", err)
+		}
+
+		game, err := flashdown.NewGameFromAccessor(file.Name(),
+			&uriDeckAccessor{
+				deck: file,
+				db:   db,
+			})
+		if err != nil {
+			return nil, fmt.Errorf("Failed to load %s: %s",
+				forHuman(file), err)
+		}
+		games = append(games, game)
 	}
 
-	// Create a list of games just to print the current progress.
-	games := make([]*flashdown.Game, len(files))
-	for i, f := range files {
-		db, err := dbFile(f)
-		if err != nil {
-			return nil, err
-		}
-		acc := &uriDeckAccessor{
-			deck: f,
-			db:   db,
-		}
-
-		games[i], err = flashdown.NewGameFromAccessor(f.Name(), acc)
-		if err != nil {
-			return nil, err
-		}
-	}
 	return games, nil
 }
 
 func WelcomeScreen(window fyne.Window) {
-	directory := directoryURI()
-	topBar := newSelectDirectory(directory, window)
+	topBar := importDirectoryButton(window)
 
-	games, err := loadGames(directory)
+	games, err := loadGames()
 	if err != nil {
-		topBar := newSelectDirectory(directory, window)
 		errLabel := widget.NewLabel(err.Error())
 		errLabel.Wrapping = fyne.TextWrapBreak
 		vbox := container.New(layout.NewVBoxLayout(),
@@ -315,30 +346,25 @@ func WelcomeScreen(window fyne.Window) {
 		return
 	}
 
-	gameList := widget.NewList(
-		func() int {
-			return len(games)
-		},
-		func() fyne.CanvasObject {
-			return widget.NewButton("template", func() {})
-		},
-		func(i widget.ListItemID, o fyne.CanvasObject) {
-			game := games[i]
-			name := path.Base(game.Name())
-			label := fmt.Sprintf("%s (%.0f%%)", name,
-				game.Success())
-			o.(*widget.Button).SetText(label)
-			o.(*widget.Button).OnTapped = func() {
-				window.SetCloseIntercept(func() {
-					game.Save()
-					window.Close()
-				})
-				QuestionScreen(window, game)
-			}
+	buttons := make([]fyne.CanvasObject, len(games))
+	for i, g := range games {
+		game := g
+		name := path.Base(game.Name())
+		label := fmt.Sprintf("%s (%.0f%%)", name, game.Success())
+		button := widget.NewButton(label, func() {
+			window.SetCloseIntercept(func() {
+				game.Save()
+				window.Close()
+			})
+			QuestionScreen(window, game)
 		})
+		buttons[i] = button
+	}
+	vbox := container.New(layout.NewVBoxLayout(), buttons...)
+	center := container.NewVScroll(vbox)
 
 	window.SetContent(container.New(layout.NewBorderLayout(
-		topBar, nil, nil, nil), topBar, gameList))
+		topBar, nil, nil, nil), topBar, center))
 }
 
 func main() {

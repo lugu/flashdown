@@ -11,13 +11,17 @@ import (
 	"github.com/acarl005/stripansi"
 )
 
+const (
+	consoleWidth = 35
+)
+
 func renderMarkdown(md string, charWidth int) string {
 	output := markdown.Render(md, charWidth, 0)
 	return stripansi.Strip(string(output))
 }
 
 func NewMarkdownContainer(md string) *fyne.Container {
-	txt := renderMarkdown(md, 80)
+	txt := renderMarkdown(md, consoleWidth)
 	objects := make([]fyne.CanvasObject, 0)
 	txtSize := fyne.MeasureText("", 0, fyne.TextStyle{Monospace: true})
 	// Empirically adjust the height so that each lines touch each other

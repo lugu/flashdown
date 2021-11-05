@@ -6,6 +6,7 @@ Unsorted list
 - WIP: gui Resize text in Android
 - WIP: gui File name not displayed correctly
 - WIP: gui Crash on restart
+- WIP: gui Import cards into local storage
 
 - GUI BUG: does not show Chinese characters
 - BUG: grabbing lambda capture brackets

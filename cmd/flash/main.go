@@ -15,6 +15,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
+	"fyne.io/fyne/v2/storage/repository"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
@@ -71,17 +72,43 @@ func setThemeName(name string) {
 	prefs.SetString("theme", name)
 }
 
+func makeDefaultDirectory() (fyne.URI, error) {
+	root := fyne.CurrentApp().Storage().RootURI()
+	child, err := storage.Child(root, "Cards")
+	if err != nil {
+		return nil, err
+	}
+	b, err := storage.Exists(child)
+	if err != nil {
+		return nil, err
+	}
+	if !b {
+		err := storage.CreateListable(child)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return child, nil
+}
+
 // getDirectory return the location where to look for decks.
 func getDirectory() fyne.URI {
 	a := fyne.CurrentApp()
 	prefs := a.Preferences()
-	dir := prefs.StringWithFallback("directory",
-		a.Storage().RootURI().String())
-	uri, err := storage.ParseURI(dir)
+	dir := prefs.StringWithFallback("directory", "")
+	if dir != "" {
+		uri, err := storage.ParseURI(dir)
+		if err != nil {
+			return uri
+		}
+	}
+	directory, err := makeDefaultDirectory()
 	if err != nil {
+		log.Printf("Failed to create %s", directory.String())
 		return a.Storage().RootURI()
 	}
-	return uri
+	setDirectory(directory)
+	return directory
 }
 
 func setDirectory(dir fyne.URI) {
@@ -244,7 +271,7 @@ func forHuman(f fyne.URI) string {
 	return file
 }
 
-func cleanUpStorage() error {
+func cleanDirectory() error {
 	files, err := storage.List(getDirectory())
 	if err != nil {
 		return err
@@ -263,11 +290,27 @@ func cleanUpStorage() error {
 }
 
 func importFile(source fyne.URI) error {
-	err := storage.Copy(source, getDirectory())
+
+	decoded, err := url.PathUnescape(source.Name())
+	filename := path.Base(decoded)
+
+	directory := getDirectory()
+	destination, err := storage.Child(directory, filename)
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to create %s at %s, %s",
+			filename, directory.String(), err)
 	}
-	return nil
+
+	err = storage.Copy(source, destination)
+	if err == nil {
+		return nil
+	}
+	err = repository.GenericCopy(source, destination)
+	if err == nil {
+		return nil
+	}
+	return fmt.Errorf("Copy error\nSource: %s\nDestination: %s\n%s",
+		source.String(), destination.String(), err)
 }
 
 func importDirectory(directory fyne.ListableURI) error {
@@ -296,13 +339,13 @@ func cleanUpStorageButton(window fyne.Window) *widget.Button {
 		if !yes {
 			return
 		}
-		err := cleanUpStorage()
+		err := cleanDirectory()
 		if err != nil {
 			ErrorScreen(window,
 				fmt.Errorf("Failed to erase data: %s", err))
 		}
 	}
-	label := "Do you want to delete all imported data?"
+	label := fmt.Sprintf("Delete %s?", getDirectory().String())
 	return widget.NewButton("Erase storage", func() {
 		dialog.ShowConfirm("Erase storage", label, cb, window)
 	})
@@ -371,7 +414,6 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 func loadGames() ([]*flashdown.Game, error) {
 	games := make([]*flashdown.Game, 0)
 
-	log.Printf("!!! directory %s", getDirectory().String())
 	files, err := storage.List(getDirectory())
 	if err != nil {
 		return nil, err
@@ -381,7 +423,6 @@ func loadGames() ([]*flashdown.Game, error) {
 		if file == nil {
 			continue
 		}
-		log.Printf("!!! file %s (%s)", file.String(), file.Extension())
 		if file.Extension() != ".md" {
 			continue
 		}

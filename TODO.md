@@ -1,6 +1,6 @@
 Unsorted list
 - WIP: gui Redo icon
-- WIP: gui New Game constructor with read/writer constructor for cards and db
+- WIP: gui Erase directory does not work
 - WIP: gui Keyboard shortcut (0-5, space, escape, skip, help)
 - WIP: gui Add a about/help/licence page (probably needed for mobile)
 - WIP: gui Resize text in Android

@@ -25,6 +25,11 @@ import (
 // uriDeckAccessor must implement flashdown.DeckAccessor
 var _ flashdown.DeckAccessor = (*uriDeckAccessor)(nil)
 
+var (
+	// foregroundColor depends on the theme used.
+	foregroundColor color.Color = color.Black
+)
+
 type uriDeckAccessor struct {
 	deck fyne.URI
 	db   fyne.URI
@@ -98,9 +103,10 @@ func getDirectory() fyne.URI {
 	dir := prefs.StringWithFallback("directory", "")
 	if dir != "" {
 		uri, err := storage.ParseURI(dir)
-		if err != nil {
+		if err == nil {
 			return uri
 		}
+		log.Print("Failed to parse %s: %s", dir, err)
 	}
 	directory, err := makeDefaultDirectory()
 	if err != nil {
@@ -170,9 +176,9 @@ func newCards(question, answer string) *fyne.Container {
 	answerBox := card(answer)
 
 	var border float32 = 2.0
-	t := canvas.NewRectangle(color.White)
+	t := canvas.NewRectangle(foregroundColor)
 	t.SetMinSize(fyne.NewSize(0, border))
-	b := canvas.NewRectangle(color.White)
+	b := canvas.NewRectangle(foregroundColor)
 	b.SetMinSize(fyne.NewSize(0, border))
 
 	questionCard := container.New(layout.NewBorderLayout(t, nil, nil, nil),
@@ -191,7 +197,7 @@ func bottomButton(label string, cb func()) *fyne.Container {
 	// be the same as answersButton (3 rows).
 	height := container.New(layout.NewGridLayout(1), button, button,
 		button).Size().Height
-	rect := canvas.NewRectangle(color.White)
+	rect := canvas.NewRectangle(foregroundColor)
 	rect.SetMinSize(fyne.NewSize(0, height))
 
 	return container.New(layout.NewBorderLayout(nil, nil, rect, nil),
@@ -283,7 +289,8 @@ func cleanDirectory() error {
 		}
 		err := storage.Delete(file)
 		if err != nil {
-			continue
+			return fmt.Errorf("Failed to delete %s: %s",
+				file.Name(), err)
 		}
 	}
 	return nil
@@ -341,11 +348,10 @@ func cleanUpStorageButton(window fyne.Window) *widget.Button {
 		}
 		err := cleanDirectory()
 		if err != nil {
-			ErrorScreen(window,
-				fmt.Errorf("Failed to erase data: %s", err))
+			ErrorScreen(window, err)
 		}
 	}
-	label := fmt.Sprintf("Delete %s?", getDirectory().String())
+	label := fmt.Sprintf("Delete cards in %s/ ?", getDirectory().Name())
 	return widget.NewButton("Erase storage", func() {
 		dialog.ShowConfirm("Erase storage", label, cb, window)
 	})
@@ -408,6 +414,7 @@ func switchThemeButton(window fyne.Window) *widget.Button {
 }
 
 func dbFile(file fyne.URI) (fyne.URI, error) {
+	// TODO: add a dot before the base name
 	return storage.ParseURI(file.String() + ".db")
 }
 
@@ -465,6 +472,7 @@ func SettingsScreen(window fyne.Window) {
 }
 
 func WelcomeScreen(window fyne.Window) {
+	foregroundColor = getForegroundColor()
 	topBar := newWelcomeTopBar(window)
 
 	games, err := loadGames()

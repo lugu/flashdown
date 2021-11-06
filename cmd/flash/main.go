@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"io"
-	"io/ioutil"
+	"log"
 	"net/url"
 	"path"
 
@@ -15,6 +15,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/lugu/flashdown"
@@ -48,8 +49,30 @@ func (u *uriDeckAccessor) MetaWriter() (io.WriteCloser, error) {
 	return w, err
 }
 
-// directoryURI return the location where to look for decks.
-func directoryURI() fyne.URI {
+func getThemeName() string {
+	prefs := fyne.CurrentApp().Preferences()
+	return prefs.StringWithFallback("theme", "light")
+}
+
+func getTheme() fyne.Theme {
+	prefs := fyne.CurrentApp().Preferences()
+	dir := prefs.String("theme")
+	switch dir {
+	case "light":
+		return theme.LightTheme()
+	case "dark":
+		return theme.DarkTheme()
+	}
+	return theme.LightTheme()
+}
+
+func setThemeName(name string) {
+	prefs := fyne.CurrentApp().Preferences()
+	prefs.SetString("theme", name)
+}
+
+// getDirectory return the location where to look for decks.
+func getDirectory() fyne.URI {
 	a := fyne.CurrentApp()
 	prefs := a.Preferences()
 	dir := prefs.StringWithFallback("directory",
@@ -61,7 +84,7 @@ func directoryURI() fyne.URI {
 	return uri
 }
 
-func setDirectoryURI(dir fyne.URI) {
+func setDirectory(dir fyne.URI) {
 	prefs := fyne.CurrentApp().Preferences()
 	prefs.SetString("directory", dir.String())
 }
@@ -77,7 +100,7 @@ func ErrorScreen(window fyne.Window, err error) {
 	window.SetContent(vbox)
 }
 
-func newTopBar(window fyne.Window, game *flashdown.Game) *fyne.Container {
+func newProgressTopBar(window fyne.Window, game *flashdown.Game) *fyne.Container {
 	percent := game.Success()
 	current, total := game.Progress()
 	text := fmt.Sprintf("Session: %d/%d — Success: %.0f%%",
@@ -87,7 +110,24 @@ func newTopBar(window fyne.Window, game *flashdown.Game) *fyne.Container {
 		game.Save()
 		WelcomeScreen(window)
 	})
+	return container.New(layout.NewBorderLayout(nil, nil, nil,
+		back), back, label)
+}
 
+func newWelcomeTopBar(window fyne.Window) *fyne.Container {
+	label := widget.NewLabel("Welcome")
+	back := widget.NewButton("Settings", func() {
+		SettingsScreen(window)
+	})
+	return container.New(layout.NewBorderLayout(nil, nil, nil,
+		back), back, label)
+}
+
+func newSettingsTopBar(window fyne.Window) *fyne.Container {
+	label := widget.NewLabel("Settings")
+	back := widget.NewButton("Home", func() {
+		WelcomeScreen(window)
+	})
 	return container.New(layout.NewBorderLayout(nil, nil, nil,
 		back), back, label)
 }
@@ -157,7 +197,7 @@ func answersButton(window fyne.Window, game *flashdown.Game) *fyne.Container {
 }
 
 func AnswerScreen(window fyne.Window, game *flashdown.Game) {
-	topBar := newTopBar(window, game)
+	topBar := newProgressTopBar(window, game)
 	cards := newCards(game.Question(), game.Answer())
 	answers := answersButton(window, game)
 
@@ -174,7 +214,7 @@ func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 		return
 	}
 
-	topBar := newTopBar(window, game)
+	topBar := newProgressTopBar(window, game)
 	answer := continueButton(window, game)
 	cards := newCards(game.Question(), "")
 
@@ -184,7 +224,7 @@ func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 }
 
 func CongratulationScreen(window fyne.Window, g *flashdown.Game) {
-	topBar := newTopBar(window, g)
+	topBar := newProgressTopBar(window, g)
 	label := container.New(layout.NewCenterLayout(),
 		widget.NewLabel("Congratulations!"))
 	button := bottomButton("Press to continue", func() {
@@ -204,51 +244,28 @@ func forHuman(f fyne.URI) string {
 	return file
 }
 
-func cleanUpStorage() {
-	a := fyne.CurrentApp()
-	root := a.Storage()
-	names := root.List()
-	for _, name := range names {
-		child, err := root.Open(name)
+func cleanUpStorage() error {
+	files, err := storage.List(getDirectory())
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		// BUG: Fyne returns some empty entries.
+		if file == nil {
+			continue
+		}
+		err := storage.Delete(file)
 		if err != nil {
 			continue
 		}
-		defer child.Close()
-		file := child.URI()
-		if file.Extension() == ".md" {
-			root.Remove(name)
-		}
 	}
+	return nil
 }
 
 func importFile(source fyne.URI) error {
-	reader, err := storage.Reader(source)
+	err := storage.Copy(source, getDirectory())
 	if err != nil {
-		return nil
-	}
-	defer reader.Close()
-	bytes, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return fmt.Errorf("Failed to read file: %s, %s",
-			forHuman(source), err)
-	}
-
-	a := fyne.CurrentApp()
-	root := a.Storage()
-
-	decoded, err := url.PathUnescape(source.Name())
-	filename := path.Base(decoded)
-
-	writer, err := root.Create(filename)
-	if err != nil {
-		return fmt.Errorf("Failed to create file: %s, %s",
-			source.Name(), err)
-	}
-	defer writer.Close()
-
-	n, err := writer.Write(bytes)
-	if n != len(bytes) {
-		return fmt.Errorf("Partial copy: %d/%d bytes", n, len(bytes))
+		return err
 	}
 	return nil
 }
@@ -258,8 +275,11 @@ func importDirectory(directory fyne.ListableURI) error {
 	if err != nil {
 		return err
 	}
-	cleanUpStorage()
 	for _, file := range files {
+		// BUG: Fyne returns some empty entries.
+		if file == nil {
+			continue
+		}
 		if file.Extension() != ".md" {
 			continue
 		}
@@ -269,6 +289,23 @@ func importDirectory(directory fyne.ListableURI) error {
 		}
 	}
 	return nil
+}
+
+func cleanUpStorageButton(window fyne.Window) *widget.Button {
+	cb := func(yes bool) {
+		if !yes {
+			return
+		}
+		err := cleanUpStorage()
+		if err != nil {
+			ErrorScreen(window,
+				fmt.Errorf("Failed to erase data: %s", err))
+		}
+	}
+	label := "Do you want to delete all imported data?"
+	return widget.NewButton("Erase storage", func() {
+		dialog.ShowConfirm("Erase storage", label, cb, window)
+	})
 }
 
 func importDirectoryButton(window fyne.Window) *widget.Button {
@@ -286,10 +323,45 @@ func importDirectoryButton(window fyne.Window) *widget.Button {
 		}
 		WelcomeScreen(window)
 	}
-	button := widget.NewButton("Import Directory", func() {
+	return widget.NewButton("Import Directory", func() {
 		dialog.NewFolderOpen(importCallback, window).Show()
 	})
-	return button
+}
+
+func changeDirectoryButton(window fyne.Window) *widget.Button {
+	changeDirectoryCallback := func(d fyne.ListableURI, err error) {
+		if err != nil {
+			ErrorScreen(window, err)
+			return
+		}
+		if d == nil {
+			return
+		}
+		setDirectory(d)
+		WelcomeScreen(window)
+	}
+	return widget.NewButton("Change Directory", func() {
+		dialog.NewFolderOpen(changeDirectoryCallback, window).Show()
+	})
+}
+
+func switchThemeButton(window fyne.Window) *widget.Button {
+	currentTheme := getThemeName()
+	var newTheme string
+	switch currentTheme {
+	case "light":
+		newTheme = "dark"
+	case "dark":
+		newTheme = "light"
+	default:
+		newTheme = "light"
+	}
+	buttonLabel := fmt.Sprintf("Theme: %s", newTheme)
+	return widget.NewButton(buttonLabel, func() {
+		setThemeName(newTheme)
+		fyne.CurrentApp().Settings().SetTheme(getTheme())
+		SettingsScreen(window)
+	})
 }
 
 func dbFile(file fyne.URI) (fyne.URI, error) {
@@ -299,16 +371,17 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 func loadGames() ([]*flashdown.Game, error) {
 	games := make([]*flashdown.Game, 0)
 
-	a := fyne.CurrentApp()
-	root := a.Storage()
+	log.Printf("!!! directory %s", getDirectory().String())
+	files, err := storage.List(getDirectory())
+	if err != nil {
+		return nil, err
+	}
 
-	for _, name := range root.List() {
-		child, err := root.Open(name)
-		if err != nil {
+	for _, file := range files {
+		if file == nil {
 			continue
 		}
-		defer child.Close()
-		file := child.URI()
+		log.Printf("!!! file %s (%s)", file.String(), file.Extension())
 		if file.Extension() != ".md" {
 			continue
 		}
@@ -333,8 +406,25 @@ func loadGames() ([]*flashdown.Game, error) {
 	return games, nil
 }
 
+func SettingsScreen(window fyne.Window) {
+	topBar := newSettingsTopBar(window)
+
+	buttons := make([]fyne.CanvasObject, 0)
+	if fyne.CurrentDevice().IsMobile() {
+		buttons = append(buttons, importDirectoryButton(window))
+		buttons = append(buttons, cleanUpStorageButton(window))
+	} else {
+		buttons = append(buttons, changeDirectoryButton(window))
+	}
+	buttons = append(buttons, switchThemeButton(window))
+	center := container.NewVScroll(container.New(layout.NewVBoxLayout(),
+		buttons...))
+	window.SetContent(container.New(layout.NewBorderLayout(
+		topBar, nil, nil, nil), topBar, center))
+}
+
 func WelcomeScreen(window fyne.Window) {
-	topBar := importDirectoryButton(window)
+	topBar := newWelcomeTopBar(window)
 
 	games, err := loadGames()
 	if err != nil {
@@ -360,6 +450,14 @@ func WelcomeScreen(window fyne.Window) {
 		})
 		buttons[i] = button
 	}
+	if len(games) == 0 {
+		info := fmt.Sprintf("No deck found in %s",
+			getDirectory().String())
+		label := widget.NewLabel(info)
+		label.Wrapping = fyne.TextWrapBreak
+		buttons = append(buttons, label)
+	}
+
 	vbox := container.New(layout.NewVBoxLayout(), buttons...)
 	center := container.NewVScroll(vbox)
 
@@ -368,7 +466,9 @@ func WelcomeScreen(window fyne.Window) {
 }
 
 func main() {
-	window := app.NewWithID("flashdown").NewWindow("Flashdown")
+	application := app.NewWithID("flashdown")
+	application.Settings().SetTheme(getTheme())
+	window := application.NewWindow("Flashdown")
 	window.Resize(fyne.NewSize(640, 480))
 	WelcomeScreen(window)
 	window.ShowAndRun()

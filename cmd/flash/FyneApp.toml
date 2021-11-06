@@ -1,0 +1,8 @@
+Website = "https://github.com/lugu/flashdown"
+
+[Details]
+  Icon = "Icon.png"
+  Name = "Flash"
+  ID = "com.github.lugu.flashdown"
+  Version = "0.1.0"
+  Build = 8

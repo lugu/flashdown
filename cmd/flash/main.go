@@ -168,7 +168,7 @@ func card(md string) fyne.CanvasObject {
 }
 
 func newCards(question, answer string) *fyne.Container {
-	questionCard := card(question)
+	questionCard := card("### " + question)
 	answerCard := card(answer)
 	line := canvas.NewLine(color.Gray16{0xaaaa})
 	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(),

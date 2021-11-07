@@ -11,7 +11,7 @@ Unsorted list
 - GUI BUG: does not show Chinese characters
 - BUG: grabbing lambda capture brackets
 - BUG: spited in the middle
-- BUG: observed 117% success; because we can repeat questions with correct answer after a long time.
+- BUG: observed 117% success; because repeat questions with correct answer after a long time.
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'
 - FEATURE: increase score over 5

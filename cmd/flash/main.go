@@ -25,11 +25,6 @@ import (
 // uriDeckAccessor must implement flashdown.DeckAccessor
 var _ flashdown.DeckAccessor = (*uriDeckAccessor)(nil)
 
-var (
-	// foregroundColor depends on the theme used.
-	foregroundColor color.Color = color.Black
-)
-
 type uriDeckAccessor struct {
 	deck fyne.URI
 	db   fyne.URI
@@ -166,27 +161,19 @@ func newSettingsTopBar(window fyne.Window) *fyne.Container {
 }
 
 // TODO: make the test selectable
-func card(md string) *fyne.Container {
-	o := NewMarkdownContainer(md)
-	return container.New(layout.NewCenterLayout(), o)
+func card(md string) fyne.CanvasObject {
+	o := widget.NewRichTextFromMarkdown(md)
+	o.Wrapping = fyne.TextWrapWord
+	return o
 }
 
 func newCards(question, answer string) *fyne.Container {
-	questionBox := card(question)
-	answerBox := card(answer)
-
-	var border float32 = 2.0
-	t := canvas.NewRectangle(foregroundColor)
-	t.SetMinSize(fyne.NewSize(0, border))
-	b := canvas.NewRectangle(foregroundColor)
-	b.SetMinSize(fyne.NewSize(0, border))
-
-	questionCard := container.New(layout.NewBorderLayout(t, nil, nil, nil),
-		t, questionBox)
-	answerCard := container.New(layout.NewBorderLayout(t, b, nil, nil),
-		t, b, answerBox)
-
-	return container.New(layout.NewGridLayout(1), questionCard, answerCard)
+	questionCard := card(question)
+	answerCard := card(answer)
+	line := canvas.NewLine(color.Gray16{0xaaaa})
+	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(),
+		questionCard, layout.NewSpacer(), line, layout.NewSpacer(),
+		answerCard, layout.NewSpacer())
 }
 
 // bottomButton return a large button.
@@ -197,7 +184,7 @@ func bottomButton(label string, cb func()) *fyne.Container {
 	// be the same as answersButton (3 rows).
 	height := container.New(layout.NewGridLayout(1), button, button,
 		button).Size().Height
-	rect := canvas.NewRectangle(foregroundColor)
+	rect := canvas.NewRectangle(color.White)
 	rect.SetMinSize(fyne.NewSize(0, height))
 
 	return container.New(layout.NewBorderLayout(nil, nil, rect, nil),
@@ -234,7 +221,8 @@ func AnswerScreen(window fyne.Window, game *flashdown.Game) {
 	cards := newCards(game.Question(), game.Answer())
 	answers := answersButton(window, game)
 
-	vbox := container.New(layout.NewBorderLayout(topBar, answers, nil, nil),
+	vbox := container.New(layout.NewBorderLayout(topBar, answers,
+		layout.NewSpacer(), layout.NewSpacer()),
 		topBar, answers, cards)
 
 	window.SetContent(vbox)
@@ -472,7 +460,6 @@ func SettingsScreen(window fyne.Window) {
 }
 
 func WelcomeScreen(window fyne.Window) {
-	foregroundColor = getForegroundColor()
 	topBar := newWelcomeTopBar(window)
 
 	games, err := loadGames()

@@ -167,6 +167,12 @@ func card(md string) fyne.CanvasObject {
 	return o
 }
 
+func newQuestionCard(question string) *fyne.Container {
+	questionCard := card("### " + question)
+	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(),
+		questionCard, layout.NewSpacer())
+}
+
 func newCards(question, answer string) *fyne.Container {
 	questionCard := card("### " + question)
 	answerCard := card(answer)
@@ -236,7 +242,7 @@ func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 
 	topBar := newProgressTopBar(window, game)
 	answer := continueButton(window, game)
-	cards := newCards(game.Question(), "")
+	cards := newQuestionCard(game.Question())
 
 	vbox := container.New(layout.NewBorderLayout(topBar, answer, nil, nil),
 		topBar, answer, cards)

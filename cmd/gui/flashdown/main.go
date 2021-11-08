@@ -13,7 +13,6 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/storage/repository"
@@ -141,6 +140,7 @@ func newProgressTopBar(window fyne.Window, game *flashdown.Game) *fyne.Container
 		current, total, percent)
 	back := widget.NewButton("Home", func() {
 		game.Save()
+		window.Canvas().SetOnTypedKey(nil)
 		WelcomeScreen(window)
 	})
 	return newTopBar(text, back)
@@ -222,20 +222,54 @@ func answersButton(window fyne.Window, game *flashdown.Game) *fyne.Container {
 	return container.New(layout.NewGridLayout(2), buttons...)
 }
 
+func answerKeyHandler(window fyne.Window, game *flashdown.Game) func(*fyne.KeyEvent) {
+	return func(key *fyne.KeyEvent) {
+		switch key.Name {
+		case fyne.Key0:
+			game.Review(flashdown.TotalBlackout)
+			QuestionScreen(window, game)
+		case fyne.Key1:
+			game.Review(flashdown.IncorrectDifficult)
+			QuestionScreen(window, game)
+		case fyne.Key2:
+			game.Review(flashdown.IncorrectEasy)
+			QuestionScreen(window, game)
+		case fyne.Key3:
+			game.Review(flashdown.CorrectDifficult)
+			QuestionScreen(window, game)
+		case fyne.Key4:
+			game.Review(flashdown.CorrectEasy)
+			QuestionScreen(window, game)
+		case fyne.Key5:
+			game.Review(flashdown.PerfectRecall)
+			QuestionScreen(window, game)
+		}
+	}
+}
+
+func questionKeyHandler(window fyne.Window, game *flashdown.Game) func(*fyne.KeyEvent) {
+	return func(key *fyne.KeyEvent) {
+		switch key.Name {
+		case fyne.KeySpace, fyne.KeyEnter:
+			AnswerScreen(window, game)
+		}
+	}
+}
+
 func AnswerScreen(window fyne.Window, game *flashdown.Game) {
 	topBar := newProgressTopBar(window, game)
 	cards := newCards(game.Question(), game.Answer())
 	answers := answersButton(window, game)
-
 	vbox := container.New(layout.NewBorderLayout(topBar, answers,
 		nil, nil), topBar, answers, cards)
-
 	window.SetContent(vbox)
+	window.Canvas().SetOnTypedKey(answerKeyHandler(window, game))
 }
 
 func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 	if game.IsFinished() {
 		game.Save()
+		window.Canvas().SetOnTypedKey(nil)
 		CongratulationScreen(window, game)
 		return
 	}
@@ -247,15 +281,7 @@ func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 	vbox := container.New(layout.NewBorderLayout(topBar, answer, nil, nil),
 		topBar, answer, cards)
 	window.SetContent(vbox)
-
-	enterShortcut := desktop.CustomShortcut{KeyName: fyne.KeyEnter, Modifier: desktop.ControlModifier}
-	window.Canvas().AddShortcut(&enterShortcut, func(shortcut fyne.Shortcut) {
-		AnswerScreen(window, game)
-	})
-	spaceShortcut := desktop.CustomShortcut{KeyName: fyne.KeySpace, Modifier: desktop.ControlModifier}
-	window.Canvas().AddShortcut(&spaceShortcut, func(shortcut fyne.Shortcut) {
-		AnswerScreen(window, game)
-	})
+	window.Canvas().SetOnTypedKey(questionKeyHandler(window, game))
 }
 
 func CongratulationScreen(window fyne.Window, g *flashdown.Game) {

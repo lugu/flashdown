@@ -178,7 +178,7 @@ func newCards(question, answer string) *fyne.Container {
 
 // bottomButton return a large button.
 func bottomButton(label string, cb func()) *fyne.Container {
-	button := widget.NewButton("See Answer", cb)
+	button := widget.NewButton(label, cb)
 
 	// Construct a invisible rectanble to force the height of the button to
 	// be the same as answersButton (3 rows).
@@ -192,7 +192,7 @@ func bottomButton(label string, cb func()) *fyne.Container {
 }
 
 func continueButton(window fyne.Window, game *flashdown.Game) *fyne.Container {
-	return bottomButton("See Answer", func() {
+	return bottomButton("See answer", func() {
 		AnswerScreen(window, game)
 	})
 }

@@ -3,6 +3,7 @@ module github.com/lugu/flashdown
 go 1.15
 
 require (
+	fyne.io/fyne v1.4.3 // indirect
 	fyne.io/fyne/v2 v2.1.2-0.20211103153407-1c0e05f066dd
 	github.com/MichaelMure/go-term-markdown v0.1.3
 	github.com/aarzilli/nucular v0.0.0-20210408133902-d3dd7b05a80a

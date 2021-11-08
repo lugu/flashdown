@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/storage/repository"
@@ -128,36 +129,35 @@ func ErrorScreen(window fyne.Window, err error) {
 	window.SetContent(vbox)
 }
 
+func newTopBar(text string, button *widget.Button) *fyne.Container {
+	label := widget.NewLabel(text)
+	return container.New(layout.NewHBoxLayout(), label, layout.NewSpacer(), button)
+
+}
 func newProgressTopBar(window fyne.Window, game *flashdown.Game) *fyne.Container {
 	percent := game.Success()
 	current, total := game.Progress()
 	text := fmt.Sprintf("Session: %d/%d — Success: %.0f%%",
 		current, total, percent)
-	label := widget.NewLabel(text)
 	back := widget.NewButton("Home", func() {
 		game.Save()
 		WelcomeScreen(window)
 	})
-	return container.New(layout.NewBorderLayout(nil, nil, nil,
-		back), back, label)
+	return newTopBar(text, back)
 }
 
 func newWelcomeTopBar(window fyne.Window) *fyne.Container {
-	label := widget.NewLabel("Welcome")
 	back := widget.NewButton("Settings", func() {
 		SettingsScreen(window)
 	})
-	return container.New(layout.NewBorderLayout(nil, nil, nil,
-		back), back, label)
+	return newTopBar("Welcome", back)
 }
 
 func newSettingsTopBar(window fyne.Window) *fyne.Container {
-	label := widget.NewLabel("Settings")
 	back := widget.NewButton("Home", func() {
 		WelcomeScreen(window)
 	})
-	return container.New(layout.NewBorderLayout(nil, nil, nil,
-		back), back, label)
+	return newTopBar("Settings", back)
 }
 
 // TODO: make the test selectable
@@ -222,8 +222,7 @@ func AnswerScreen(window fyne.Window, game *flashdown.Game) {
 	answers := answersButton(window, game)
 
 	vbox := container.New(layout.NewBorderLayout(topBar, answers,
-		layout.NewSpacer(), layout.NewSpacer()),
-		topBar, answers, cards)
+		nil, nil), topBar, answers, cards)
 
 	window.SetContent(vbox)
 }
@@ -242,6 +241,15 @@ func QuestionScreen(window fyne.Window, game *flashdown.Game) {
 	vbox := container.New(layout.NewBorderLayout(topBar, answer, nil, nil),
 		topBar, answer, cards)
 	window.SetContent(vbox)
+
+	enterShortcut := desktop.CustomShortcut{KeyName: fyne.KeyEnter, Modifier: desktop.ControlModifier}
+	window.Canvas().AddShortcut(&enterShortcut, func(shortcut fyne.Shortcut) {
+		AnswerScreen(window, game)
+	})
+	spaceShortcut := desktop.CustomShortcut{KeyName: fyne.KeySpace, Modifier: desktop.ControlModifier}
+	window.Canvas().AddShortcut(&spaceShortcut, func(shortcut fyne.Shortcut) {
+		AnswerScreen(window, game)
+	})
 }
 
 func CongratulationScreen(window fyne.Window, g *flashdown.Game) {

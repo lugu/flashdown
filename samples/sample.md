@@ -6,7 +6,9 @@ Attested from c. 3000 BC. in mesopotamia (modern-day Iraq).
 Example: 𒄀𒆠𒌵𒆤  (E a ni): "her Temple"
 
 # Concept of **yin** and **yang**
-A concept of dualism, describing how seemingly opposite or contrary
+
+Yin & Yang
+: A concept of dualism, describing how seemingly opposite or contrary
 forces may actually be _complementary_, _interconnected_, and
 _interdependent_ in the natural world.
 

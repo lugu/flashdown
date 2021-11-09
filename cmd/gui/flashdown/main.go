@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"path"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -213,11 +214,11 @@ func answersButton(window fyne.Window, game *flashdown.Game) *fyne.Container {
 	}
 	buttons := []fyne.CanvasObject{
 		bt("Total blackout", flashdown.TotalBlackout),
-		bt("Correct difficult", flashdown.CorrectDifficult),
-		bt("Incorrect difficult", flashdown.IncorrectDifficult),
-		bt("Correct easy", flashdown.CorrectEasy),
-		bt("Incorrect easy", flashdown.IncorrectEasy),
 		bt("Perfect recall", flashdown.PerfectRecall),
+		bt("Incorrect difficult", flashdown.IncorrectDifficult),
+		bt("Correct difficult", flashdown.CorrectDifficult),
+		bt("Incorrect easy", flashdown.IncorrectEasy),
+		bt("Correct easy", flashdown.CorrectEasy),
 	}
 	return container.New(layout.NewGridLayout(2), buttons...)
 }
@@ -442,8 +443,10 @@ func switchThemeButton(window fyne.Window) *widget.Button {
 }
 
 func dbFile(file fyne.URI) (fyne.URI, error) {
-	// TODO: add a dot before the base name
-	return storage.ParseURI(file.String() + ".db")
+	uri := file.String()
+	base := path.Base(uri)
+	uri = strings.Replace(uri, base, "."+base+".db", 1)
+	return storage.ParseURI(uri)
 }
 
 func loadGames() ([]*flashdown.Game, error) {

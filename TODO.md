@@ -1,8 +1,5 @@
 Unsorted list
 
-- while splash screen
-- refactor application with screen interface
-
 - GUI: Redo icon
 - GUI: Erase directory does not work
 - GUI: Add a about/help/licence page (probably needed for mobile)

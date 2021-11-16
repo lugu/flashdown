@@ -11,15 +11,50 @@ import (
 	"github.com/lugu/flashdown"
 )
 
+type maxWidthCenterLayout struct {
+	width float32
+}
+
+// NewCenterWithMaxWidthLayout returns a layout which centers its content
+// elements given them no more than width.
+func NewMaxWidthCenterLayout(width float32) fyne.Layout {
+	return &maxWidthCenterLayout{width}
+}
+
+func (c *maxWidthCenterLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+	pos := fyne.NewPos(0, 0)
+	if size.Width > c.width {
+		pos.X = (size.Width - c.width) / 2
+		size.Width = c.width
+	}
+	for _, child := range objects {
+		child.Resize(size)
+		child.Move(pos)
+	}
+}
+
+func (c *maxWidthCenterLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
+	minSize := fyne.NewSize(0, 0)
+	for _, child := range objects {
+		if !child.Visible() {
+			continue
+		}
+
+		minSize = minSize.Max(child.MinSize())
+	}
+	return minSize
+}
+
 func space() fyne.CanvasObject {
 	return layout.NewSpacer()
 }
 
 // TODO: make the test selectable
 func card(md string) fyne.CanvasObject {
-	o := widget.NewRichTextFromMarkdown(md)
-	o.Wrapping = fyne.TextWrapWord
-	return o
+	richText := widget.NewRichTextFromMarkdown(md)
+	width := richText.MinSize().Width
+	richText.Wrapping = fyne.TextWrapWord
+	return container.New(NewMaxWidthCenterLayout(width), richText)
 }
 
 type QuestionScreen struct {

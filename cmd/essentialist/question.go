@@ -1,12 +1,26 @@
 package main
 
 import (
+	"image/color"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/lugu/flashdown"
 )
+
+func space() fyne.CanvasObject {
+	return layout.NewSpacer()
+}
+
+// TODO: make the test selectable
+func card(md string) fyne.CanvasObject {
+	o := widget.NewRichTextFromMarkdown(md)
+	o.Wrapping = fyne.TextWrapWord
+	return o
+}
 
 type QuestionScreen struct {
 	game *flashdown.Game
@@ -29,11 +43,11 @@ func (s *QuestionScreen) Show(app Application) {
 	window := app.Window()
 
 	topBar := newProgressTopBar(app, s.game)
-	answer := continueButton(app, s.game)
-	cards := newQuestionCard(s.game.Question())
+	question := card("### " + s.game.Question())
+	button := continueButton(app, s.game)
 
-	vbox := container.New(layout.NewBorderLayout(topBar, answer, nil, nil),
-		topBar, answer, cards)
+	vbox := container.New(layout.NewVBoxLayout(), topBar, space(), question,
+		space(), button)
 	window.SetContent(vbox)
 	window.Canvas().SetOnTypedKey(s.questionKeyHandler(app))
 }
@@ -96,13 +110,18 @@ func (s *AnswerScreen) answerKeyHandler(app Application) func(*fyne.KeyEvent) {
 		}
 	}
 }
+
 func (s *AnswerScreen) Show(app Application) {
 	window := app.Window()
 	topBar := newProgressTopBar(app, s.game)
-	cards := newCards(s.game.Question(), s.game.Answer())
-	answers := s.answersButton(app)
-	vbox := container.New(layout.NewBorderLayout(topBar, answers,
-		nil, nil), topBar, answers, cards)
+
+	question := card("### " + s.game.Question())
+	line := canvas.NewLine(color.Gray16{0xaaaa})
+	answer := card(s.game.Answer())
+
+	buttons := s.answersButton(app)
+	vbox := container.New(layout.NewVBoxLayout(), topBar, space(), question,
+		space(), line, space(), answer, space(), buttons)
 	window.SetContent(vbox)
 	window.Canvas().SetOnTypedKey(s.answerKeyHandler(app))
 }

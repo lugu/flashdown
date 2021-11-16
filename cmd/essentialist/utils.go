@@ -111,28 +111,6 @@ func newWelcomeTopBar(app Application) *fyne.Container {
 	return newTopBar("Welcome", back)
 }
 
-// TODO: make the test selectable
-func card(md string) fyne.CanvasObject {
-	o := widget.NewRichTextFromMarkdown(md)
-	o.Wrapping = fyne.TextWrapWord
-	return o
-}
-
-func newQuestionCard(question string) *fyne.Container {
-	questionCard := card("### " + question)
-	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(),
-		questionCard, layout.NewSpacer())
-}
-
-func newCards(question, answer string) *fyne.Container {
-	questionCard := card("### " + question)
-	answerCard := card(answer)
-	line := canvas.NewLine(color.Gray16{0xaaaa})
-	return container.New(layout.NewVBoxLayout(), layout.NewSpacer(),
-		questionCard, layout.NewSpacer(), line, layout.NewSpacer(),
-		answerCard, layout.NewSpacer())
-}
-
 // bottomButton return a large button.
 func bottomButton(label string, cb func()) *fyne.Container {
 	button := widget.NewButton(label, cb)

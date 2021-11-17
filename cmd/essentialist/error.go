@@ -38,7 +38,7 @@ func NewFatalScreen(err error) Screen {
 }
 
 func (e *FatalScreen) Show(app Application) {
-	topBar := newWelcomeTopBar(app)
+	topBar := newHomeTopBar(app)
 	errLabel := widget.NewLabel(e.err.Error())
 	errLabel.Wrapping = fyne.TextWrapBreak
 	vbox := container.New(layout.NewVBoxLayout(),

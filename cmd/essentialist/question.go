@@ -65,11 +65,14 @@ func NewQuestionScreen(game *flashdown.Game) Screen {
 	return &QuestionScreen{game: game}
 }
 
-func (s *QuestionScreen) questionKeyHandler(app Application) func(*fyne.KeyEvent) {
+func (s *QuestionScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
 		switch key.Name {
 		case fyne.KeySpace, fyne.KeyEnter:
 			app.Display(NewAnswerScreen(s.game))
+		case fyne.KeyQ, fyne.KeyEscape:
+			s.game.Save()
+			app.Display(NewSplashScreen())
 		}
 	}
 }
@@ -84,7 +87,7 @@ func (s *QuestionScreen) Show(app Application) {
 	vbox := container.New(layout.NewVBoxLayout(), topBar, space(), question,
 		space(), button)
 	window.SetContent(vbox)
-	window.Canvas().SetOnTypedKey(s.questionKeyHandler(app))
+	window.Canvas().SetOnTypedKey(s.keyHandler(app))
 }
 
 func (s *QuestionScreen) Hide(app Application) {
@@ -127,7 +130,7 @@ func (s *AnswerScreen) reviewScore(app Application, score flashdown.Score) {
 	}
 }
 
-func (s *AnswerScreen) answerKeyHandler(app Application) func(*fyne.KeyEvent) {
+func (s *AnswerScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
 		switch key.Name {
 		case fyne.Key0:
@@ -142,6 +145,9 @@ func (s *AnswerScreen) answerKeyHandler(app Application) func(*fyne.KeyEvent) {
 			s.reviewScore(app, flashdown.CorrectEasy)
 		case fyne.Key5:
 			s.reviewScore(app, flashdown.PerfectRecall)
+		case fyne.KeyQ, fyne.KeyEscape:
+			s.game.Save()
+			app.Display(NewSplashScreen())
 		}
 	}
 }
@@ -158,7 +164,7 @@ func (s *AnswerScreen) Show(app Application) {
 	vbox := container.New(layout.NewVBoxLayout(), topBar, space(), question,
 		space(), line, space(), answer, space(), buttons)
 	window.SetContent(vbox)
-	window.Canvas().SetOnTypedKey(s.answerKeyHandler(app))
+	window.Canvas().SetOnTypedKey(s.keyHandler(app))
 }
 
 func (s *AnswerScreen) Hide(app Application) {

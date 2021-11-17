@@ -11,15 +11,24 @@ import (
 	"github.com/lugu/flashdown"
 )
 
-type WelcomeScreen struct {
+type HomeScreen struct {
 	games []*flashdown.Game
 }
 
-func NewWelcomeScreen(games []*flashdown.Game) Screen {
-	return &WelcomeScreen{games: games}
+func NewHomeScreen(games []*flashdown.Game) Screen {
+	return &HomeScreen{games: games}
 }
 
-func (s *WelcomeScreen) Show(app Application) {
+func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
+	return func(key *fyne.KeyEvent) {
+		switch key.Name {
+		case fyne.KeyQ, fyne.KeyEscape:
+			app.Window().Close()
+		}
+	}
+}
+
+func (s *HomeScreen) Show(app Application) {
 	window := app.Window()
 	buttons := make([]fyne.CanvasObject, len(s.games))
 	for i, g := range s.games {
@@ -45,10 +54,13 @@ func (s *WelcomeScreen) Show(app Application) {
 
 	vbox := container.New(layout.NewVBoxLayout(), buttons...)
 	center := container.NewVScroll(vbox)
-	topBar := newWelcomeTopBar(app)
+	topBar := newHomeTopBar(app)
 
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))
+	window.Canvas().SetOnTypedKey(s.keyHandler(app))
 }
 
-func (s *WelcomeScreen) Hide(app Application) {}
+func (s *HomeScreen) Hide(app Application) {
+	app.Window().Canvas().SetOnTypedKey(nil)
+}

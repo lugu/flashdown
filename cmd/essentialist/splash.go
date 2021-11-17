@@ -14,10 +14,10 @@ func (s *SplashScreen) load(app Application) {
 		app.Display(NewFatalScreen(err))
 		return
 	}
-	app.Display(NewWelcomeScreen(games))
+	app.Display(NewHomeScreen(games))
 }
 
-// Show a white screen until the games are loaded, then shows WelcomeScreen.
+// Show a white screen until the games are loaded, then shows HomeScreen.
 func (s *SplashScreen) Show(app Application) {
 	// Display white content
 	rect := canvas.NewRectangle(color.White)

@@ -104,11 +104,11 @@ func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {
 	return newTopBar(text, back)
 }
 
-func newWelcomeTopBar(app Application) *fyne.Container {
+func newHomeTopBar(app Application) *fyne.Container {
 	back := widget.NewButton("Settings", func() {
 		app.Display(NewSettingsScreen())
 	})
-	return newTopBar("Welcome", back)
+	return newTopBar("Home", back)
 }
 
 // bottomButton return a large button.

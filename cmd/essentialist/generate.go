@@ -1,2 +1,2 @@
-//go:generate fyne package -os android -appID com.github.lugu.flashdown
+//go:generate fyne package -os android
 package main

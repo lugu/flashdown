@@ -1,11 +1,3 @@
-# CJK
-
-- Simplified Chinese: 创译
-
-- Japanese: クリエイティブ　トランスレーション
-
-- Korean: 크리에이티브 트랜스레이션
-
 # Oldest known written language?
 Sumerian language
 

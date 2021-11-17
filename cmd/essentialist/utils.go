@@ -30,9 +30,9 @@ func getTheme() fyne.Theme {
 	dir := prefs.String("theme")
 	switch dir {
 	case "light":
-		return NewTheme(theme.LightTheme())
+		return theme.LightTheme()
 	case "dark":
-		return NewTheme(theme.DarkTheme())
+		return theme.DarkTheme()
 	}
 	return theme.LightTheme()
 }

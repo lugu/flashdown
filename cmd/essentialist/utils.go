@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -212,34 +213,56 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 }
 
 func loadGames() ([]*flashdown.Game, error) {
-	games := make([]*flashdown.Game, 0)
 
 	files, err := storage.List(getDirectory())
 	if err != nil {
 		return nil, err
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(len(files))
+
+	results := make(chan *flashdown.Game, len(files))
+	errors := make(chan error, len(files))
+
 	for _, file := range files {
-		if file == nil {
-			continue
-		}
-		if file.Extension() != ".md" {
-			continue
-		}
+		go func(file fyne.URI) {
+			defer wg.Done()
+			if file == nil {
+				return
+			}
+			if file.Extension() != ".md" {
+				return
+			}
 
-		db, err := dbFile(file)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to create URI: %s", err)
-		}
+			db, err := dbFile(file)
+			if err != nil {
+				errors <- fmt.Errorf("Failed to create URI: %s", err)
+				return
+			}
 
-		game, err := flashdown.NewGameFromAccessor(file.Name(),
-			NewDeckAccessor(file, db))
-		if err != nil {
-			return nil, fmt.Errorf("Failed to load %s: %s",
-				forHuman(file), err)
-		}
+			game, err := flashdown.NewGameFromAccessor(file.Name(),
+				NewDeckAccessor(file, db))
+			if err != nil {
+				errors <- fmt.Errorf("Failed to load %s: %s",
+					forHuman(file), err)
+				return
+			}
+			results <- game
+		}(file)
+	}
+	wg.Wait()
+	close(results)
+
+	games := make([]*flashdown.Game, 0)
+	for game := range results {
 		games = append(games, game)
 	}
 
-	return games, nil
+	select {
+	case err := <-errors:
+		return nil, err
+	default:
+		return games, nil
+	}
 }

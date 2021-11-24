@@ -9,6 +9,7 @@ Unsorted list
 - BUG: grabbing lambda capture brackets
 - BUG: spited in the middle
 - BUG: observed 117% success; because repeat questions with correct answer after a long time.
+- BUG: line matching '^#' is parsed like a question while it can be in a code section. Should use a parser to split the questions.
 
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'

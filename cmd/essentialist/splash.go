@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"sort"
 
 	"fyne.io/fyne/v2/canvas"
 )
@@ -14,6 +15,10 @@ func (s *SplashScreen) load(app Application) {
 		app.Display(NewFatalScreen(err))
 		return
 	}
+	sort.SliceStable(games, func(i, j int) bool {
+		return games[i].Name() < games[j].Name()
+	})
+
 	app.Display(NewHomeScreen(games))
 }
 

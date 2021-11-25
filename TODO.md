@@ -1,17 +1,16 @@
 Unsorted list
 
-- GUI: Erase directory does not work
-- GUI: Add a about/help/licence page (probably needed for mobile)
-- GUI: When displaying multiple line of MD, last and first words are merged.
-- GUI: Shortcut up and down arrow to select the deck
-- GUI: Consider a grid pattern instead of a long list
+- GUI: Erase directory does not work.
+- GUI: Add a about/help/licence page (probably needed for mobile).
+- GUI: Shortcut up and down arrow to select the deck.
+- GUI: Consider a grid pattern instead of a long list.
+- GUI: Option for a simplified Correct/Incorrect UI.
+- GUI: Cards are no more in alphabetical order: sort them before display.
+- GUI: Add option to load a Chinese / Japanese / Korean font (and create a bug to automate this choice when a deck/card is loaded based on the needed unicode).
 
-- BUG: grabbing lambda capture brackets
-- BUG: spited in the middle
-- BUG: observed 117% success; because repeat questions with correct answer after a long time.
+- BUG: More and 100% success; because repeat questions with correct answer after a long time.
 - BUG: line matching '^#' is parsed like a question while it can be in a code section. Should use a parser to split the questions.
 
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'
 - FEATURE: save the question in the db for debug purpose
-- FEATURE: Add support for Chinese characters when Fyne supports it.

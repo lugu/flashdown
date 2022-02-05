@@ -72,7 +72,7 @@ func getDirectory() fyne.URI {
 		if err == nil {
 			return uri
 		}
-		log.Print("Failed to parse %s: %s", dir, err)
+		log.Printf("Failed to parse %s: %v", dir, err)
 	}
 	directory, err := makeDefaultDirectory()
 	if err != nil {

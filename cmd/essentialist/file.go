@@ -33,6 +33,10 @@ func (u *uriDeckAccessor) MetaWriter() (io.WriteCloser, error) {
 	return w, err
 }
 
+func (u *uriDeckAccessor) DeckName() string {
+	return u.deck.Name()
+}
+
 func NewDeckAccessor(deck, db fyne.URI) flashdown.DeckAccessor {
 	return &uriDeckAccessor{
 		deck: deck,

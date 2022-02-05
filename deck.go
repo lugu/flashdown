@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 )
@@ -14,6 +15,7 @@ type MetaMap map[Digest]*Meta
 
 // DeckAccessor abstract IO operations around Deck handling.
 type DeckAccessor interface {
+	DeckName() string
 	CardsReader() (io.ReadCloser, error)
 	MetaReader() (io.ReadCloser, error)
 	MetaWriter() (io.WriteCloser, error)
@@ -44,6 +46,10 @@ func (f *fileAccessor) MetaReader() (io.ReadCloser, error) {
 
 func (f *fileAccessor) MetaWriter() (io.WriteCloser, error) {
 	return os.Create(f.metaFile())
+}
+
+func (f *fileAccessor) DeckName() string {
+	return path.Base(f.filename)
 }
 
 type Deck struct {

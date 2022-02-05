@@ -168,13 +168,3 @@ func TestWriteRead(t *testing.T) {
 		}
 	}
 }
-
-func TestMetaMap(t *testing.T) {
-	metas := metaMap(metaInput)
-	for i, meta := range metaInput {
-		_, ok := metas[meta.Hash]
-		if !ok {
-			t.Errorf("Missing input %d", i)
-		}
-	}
-}

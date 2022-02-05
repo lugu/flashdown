@@ -9,7 +9,7 @@ import (
 )
 
 func TestOpenDeck(t *testing.T) {
-	d, err := OpenDeck("samples/testdata/test-1.md")
+	d, err := NewDeckFromFile("samples/testdata/test-1.md")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +20,7 @@ func TestOpenDeck(t *testing.T) {
 }
 
 func TestMissingAnswer(t *testing.T) {
-	_, err := OpenDeck("samples/testdata/test-2.md")
+	_, err := NewDeckFromFile("samples/testdata/test-2.md")
 	if err == nil {
 		t.Error("missing error")
 	}
@@ -42,11 +42,11 @@ answer 2
 		t.Fatalf("write error: %s", err)
 	}
 	file.Close()
-	d, err := OpenDeck(file.Name())
+	d, err := NewDeckFromFile(file.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = SaveDeckMeta(d)
+	err = d.SaveDeckMeta()
 	if err != nil {
 		t.Error(err)
 	}

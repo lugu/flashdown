@@ -79,6 +79,13 @@ func (g *Game) Answer() string {
 	return g.cards[g.index].Answer
 }
 
+func (g *Game) DeckName() string {
+	if len(g.cards) == 0 {
+		return "zero"
+	}
+	return g.cards[g.index].DeckName
+}
+
 // Score represents how easly one responded to a question.
 type Score int
 

@@ -22,6 +22,7 @@ var (
 type Card struct {
 	Question string
 	Answer   string
+	DeckName string
 	Meta     *Meta
 }
 

@@ -117,6 +117,7 @@ func main() {
 		current, total := game.Progress()
 		q.Title = fmt.Sprintf(`Card: %d/%d — Success %2.0f%%`,
 			current, total, percent)
+		a.Title = fmt.Sprintf(`Deck: %s`, game.DeckName())
 	}
 
 	ask := func() {

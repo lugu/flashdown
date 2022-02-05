@@ -1,8 +1,6 @@
 # Flashcards in Markdown
 
-![build](https://github.com/lugu/flashdown/workflows/Build/badge.svg)
-
-A spaced repetition game (based on SM-2) for plain text flashcards.
+A spaced repetition game (based on SM-2) for flashcards in Markdown.
 
 Similar project: https://github.com/Yvee1/hascard
 
@@ -51,7 +49,7 @@ Answer with a table
 │                                                                              │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
-┌──────────────────────────────────────────────────────────────────────────────┐
+┌─Deck: test.md────────────────────────────────────────────────────────────────┐
 │                             Answer with a table                              │
 │                             ┌───┬───┐                                        │
 │                             │A  │B  │                                        │

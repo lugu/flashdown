@@ -4,53 +4,11 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"os"
-	"path"
-	"path/filepath"
 	"time"
 )
 
 // MetaMap associate the index if the cards with its meta data.
 type MetaMap map[Digest]*Meta
-
-// DeckAccessor abstract IO operations around Deck handling.
-type DeckAccessor interface {
-	DeckName() string
-	CardsReader() (io.ReadCloser, error)
-	MetaReader() (io.ReadCloser, error)
-	MetaWriter() (io.WriteCloser, error)
-}
-
-type fileAccessor struct {
-	filename string
-}
-
-func newFileDeckAccessor(filename string) DeckAccessor {
-	return &fileAccessor{filename}
-}
-
-func (f *fileAccessor) metaFile() string {
-	base := filepath.Base(f.filename)
-	base = "." + base + ".db"
-	dir := filepath.Dir(f.filename)
-	return filepath.Join(dir, base)
-}
-
-func (f *fileAccessor) CardsReader() (io.ReadCloser, error) {
-	return os.Open(f.filename)
-}
-
-func (f *fileAccessor) MetaReader() (io.ReadCloser, error) {
-	return os.Open(f.metaFile())
-}
-
-func (f *fileAccessor) MetaWriter() (io.WriteCloser, error) {
-	return os.Create(f.metaFile())
-}
-
-func (f *fileAccessor) DeckName() string {
-	return path.Base(f.filename)
-}
 
 type Deck struct {
 	Cards      []Card
@@ -107,8 +65,8 @@ func loadMetaMap(accessor DeckAccessor) (MetaMap, error) {
 		return metaMap, nil
 	}
 
-	for i, meta := range metas {
-		metaMap[meta.Hash] = &metas[i]
+	for i := range metas {
+		metaMap[metas[i].Hash] = &metas[i]
 	}
 	return metaMap, nil
 }
@@ -129,7 +87,9 @@ func NewDeck(accessor DeckAccessor) (*Deck, error) {
 		return nil, err
 	}
 
+	deckName := accessor.DeckName()
 	for i, _ := range cards {
+		cards[i].DeckName = deckName
 		hash := Hash(cards[i])
 		meta, ok := metaMap[hash]
 		if ok {

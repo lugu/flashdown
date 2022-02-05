@@ -11,11 +11,6 @@ Unsorted list
 - BUG: More and 100% success; because repeat questions with correct answer after a long time.
 - BUG: line matching '^#' is parsed like a question while it can be in a code section. Should use a parser to split the questions.
 
-- FEATURE: shows the name of the deck to give context about the card being asked
-        - DeckAccessor returns the name of the deck
-        - loadCards adds the name of the deck to the card
-        - readCards add the name of the deck to the card
-        - updateTitle updates the name of the deck
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'
 - FEATURE: save the question in the db for debug purpose

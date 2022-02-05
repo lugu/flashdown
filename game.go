@@ -50,16 +50,16 @@ func NewGame(name string, useAllCards bool, decks []*Deck) (*Game, error) {
 		name:  name,
 	}
 	for i, deck := range decks {
+		cards := deck.SelectBefore(time.Now())
 		if useAllCards {
-			game.cards = append(game.cards, deck.Cards...)
-		} else {
-			game.cards = append(game.cards, deck.SelectBefore(time.Now())...)
+			cards = deck.Cards
 		}
-		game.success += deck.DeckSuccessNb()
+		game.cards = append(game.cards, cards...)
+		game.success += len(deck.Cards) - len(cards)
+		game.total += len(deck.Cards)
 		game.decks[i] = deck
 	}
 	game.cards = ShuffleCards(game.cards)
-	game.total = len(game.cards)
 	return game, nil
 }
 

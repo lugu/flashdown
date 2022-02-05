@@ -122,17 +122,6 @@ func (d *Deck) SelectBefore(now time.Time) []Card {
 	return cards
 }
 
-// DeckSuccess returns the nubmer of success in the deck.
-func (d *Deck) DeckSuccessNb() int {
-	var success int
-	for _, card := range d.Cards {
-		if card.Meta.Repetition > 0 {
-			success++
-		}
-	}
-	return success
-}
-
 func (d *Deck) SaveDeckMeta() error {
 
 	metas := make([]Meta, len(d.Cards))

@@ -6,10 +6,13 @@ Unsorted list
 - GUI: Consider a grid pattern instead of a long list.
 - GUI: Option for a simplified Correct/Incorrect UI.
 - GUI: Cards are no more in alphabetical order: sort them before display.
-- GUI: Add option to load a Chinese / Japanese / Korean font (and create a bug to automate this choice when a deck/card is loaded based on the needed unicode).
+- GUI: Add option to load a Chinese / Japanese / Korean font (and create a bug
+  to automate this choice when a deck/card is loaded based on the needed
+  unicode).
 
-- BUG: More and 100% success; because repeat questions with correct answer after a long time.
-- BUG: line matching '^#' is parsed like a question while it can be in a code section. Should use a parser to split the questions.
+- BUG: line matching '^#' is parsed like a question while it can be in a code
+  section. Should use a parser to split the questions. Work around, use '>' in
+  front.
 
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'

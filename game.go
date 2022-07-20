@@ -15,8 +15,14 @@ type Game struct {
 	finished bool
 }
 
-// NewGameFromFiles reads the markdown files to instantiate a Game.
-func NewGameFromFiles(useAllCards bool, files []string) (*Game, error) {
+const (
+	ALL_CARDS       = -1
+	CARDS_TO_REVIEW = 0
+)
+
+// NewGameFromFiles reads the markdown files to instantiate a Game. cardsNb
+// represents the maximum number of cards to use.
+func NewGameFromFiles(cardsNb int, files []string) (*Game, error) {
 	decks := make([]*Deck, len(files))
 	name := ""
 	for i, file := range files {
@@ -30,7 +36,7 @@ func NewGameFromFiles(useAllCards bool, files []string) (*Game, error) {
 		}
 		name = name + file
 	}
-	return NewGame(name, useAllCards, decks)
+	return NewGame(name, cardsNb, decks)
 }
 
 // NewGameFromFiles reads the markdown files to instantiate a Game.
@@ -39,11 +45,16 @@ func NewGameFromAccessor(name string, accessor DeckAccessor) (*Game, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewGame(name, false, []*Deck{deck})
+	return NewGame(name, CARDS_TO_REVIEW, []*Deck{deck})
 }
 
 // NewGame returns a game given a set of markdown files.
-func NewGame(name string, useAllCards bool, decks []*Deck) (*Game, error) {
+//
+// If cardsNb is equal to ALL_CARDS, all cards in the deck are used. If cardsNb
+// is CARDS_TO_REVIEW then all the cards that needs to be review will be uesd.
+// If cardsNb is a strictly positive number, up to cardsNb from the cards to
+// review will be used.
+func NewGame(name string, cardsNb int, decks []*Deck) (*Game, error) {
 	game := &Game{
 		cards: make([]Card, 0),
 		decks: decks,
@@ -51,7 +62,7 @@ func NewGame(name string, useAllCards bool, decks []*Deck) (*Game, error) {
 	}
 	for i, deck := range decks {
 		cards := deck.SelectBefore(time.Now())
-		if useAllCards {
+		if cardsNb == ALL_CARDS {
 			cards = deck.Cards
 		}
 		game.cards = append(game.cards, cards...)
@@ -60,6 +71,9 @@ func NewGame(name string, useAllCards bool, decks []*Deck) (*Game, error) {
 		game.decks[i] = deck
 	}
 	game.cards = ShuffleCards(game.cards)
+	if cardsNb > 0 && len(game.cards) > cardsNb {
+		game.cards = game.cards[0:cardsNb]
+	}
 	return game, nil
 }
 
@@ -129,7 +143,7 @@ func (g *Game) Skip() {
 }
 
 func (g *Game) Progress() (current, total int) {
-	return g.index + 1, g.total
+	return g.index + 1, len(g.cards)
 }
 
 func (g *Game) Success() float32 {

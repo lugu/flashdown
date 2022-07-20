@@ -19,5 +19,5 @@ Unsorted list
 - FEATURE: save to file with 'w'
 - FEATURE: save the question in the db for debug purpose
 
-- FEATURE: --number <number of cards> : how many cards to do in a session.
 - FEATURE: --timeout <seconds> : how to long to wait before skipping a card.
+- FEATURE: investigate https://github.com/slaypni/SM-15/blob/master/sm.js

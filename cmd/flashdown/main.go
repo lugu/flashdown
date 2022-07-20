@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	ui "github.com/gizak/termui/v3"
@@ -16,10 +17,11 @@ const (
 
 	usageMsg = `Spaced repetition program for flashcards in markdown.
 
-Usage: %s [-a] <deck_file> [<deck_file> ...]
+Usage: %s [-a] [-n <number of cards>] <deck_file> [<deck_file> ...]
 Flags:
 	-a : force all cards in the deck to be used.
 	-h : show this message.
+	-n : limit the number of cards
 
 Deck files are plain text with heading level 1 being the question:
 
@@ -62,18 +64,34 @@ func main() {
 		os.Exit(1)
 	}
 
-	userAllCards := false
+	cardsNb := flashdown.CARDS_TO_REVIEW
 	files := make([]string, 0, len(os.Args))
 
 	for i := 1; i < len(os.Args); i++ {
+		if os.Args[i] == "-h" {
+			fmt.Printf(usageMsg, os.Args[0])
+			os.Exit(0)
+		}
 		if os.Args[i] == "-a" {
-			userAllCards = true
+			cardsNb = flashdown.ALL_CARDS
+			continue
+		}
+		if os.Args[i] == "-n" {
+			var err error
+			if i < len(os.Args) {
+				i++
+				cardsNb, err = strconv.Atoi(os.Args[i])
+			}
+			if cardsNb <= 0 || err != nil {
+				fmt.Print("Argument -n must be followed by a positive number.\n")
+				os.Exit(1)
+			}
 			continue
 		}
 		files = append(files, os.Args[i])
 	}
 
-	game, err := flashdown.NewGameFromFiles(userAllCards, files)
+	game, err := flashdown.NewGameFromFiles(cardsNb, files)
 	if err != nil {
 		log.Fatal(err)
 	}

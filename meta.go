@@ -20,8 +20,7 @@ const (
 
 // Meta contains information about the succces of a card.
 type Meta struct {
-	Question   string    // used for debugging purpose
-	Hash       Digest    // access key
+	Hash       Digest
 	NextTime   time.Time // next time to ask
 	Repetition int32     // # of success in a row
 	Easiness   float32   // how easy is it
@@ -30,7 +29,6 @@ type Meta struct {
 // NewMeta initialize a new card
 func NewMeta(card Card) *Meta {
 	return &Meta{
-		Question:   card.Question,
 		Hash:       Hash(card),
 		Repetition: 0,
 		Easiness:   defaultEasiness,

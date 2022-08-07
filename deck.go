@@ -94,6 +94,8 @@ func NewDeck(accessor DeckAccessor) (*Deck, error) {
 		meta, ok := metaMap[hash]
 		if ok {
 			cards[i].Meta = meta
+			// For debugging purpose, add the question.
+			cards[i].Meta.Question = cards[i].Question
 		} else {
 			cards[i].Meta = NewMeta(cards[i])
 		}

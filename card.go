@@ -75,6 +75,6 @@ func loadCard(md string) (c Card, err error) {
 	}
 	c.Question = trim(sheets[0])
 	c.Answer = trim(sheets[1])
-	c.Meta = NewMeta(Hash(c))
+	c.Meta = NewMeta(c)
 	return c, nil
 }

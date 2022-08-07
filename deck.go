@@ -95,7 +95,7 @@ func NewDeck(accessor DeckAccessor) (*Deck, error) {
 		if ok {
 			cards[i].Meta = meta
 		} else {
-			cards[i].Meta = NewMeta(hash)
+			cards[i].Meta = NewMeta(cards[i])
 		}
 	}
 

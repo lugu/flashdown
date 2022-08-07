@@ -27,9 +27,9 @@ type Meta struct {
 }
 
 // NewMeta initialize a new card
-func NewMeta(hash Digest) *Meta {
+func NewMeta(card Card) *Meta {
 	return &Meta{
-		Hash:       hash,
+		Hash:       Hash(card),
 		Repetition: 0,
 		Easiness:   defaultEasiness,
 		NextTime:   time.Now(),

@@ -75,7 +75,7 @@ func TestHash(t *testing.T) {
 func TestMetaReview(t *testing.T) {
 
 	var card Card
-	meta := NewMeta(Hash(card))
+	meta := NewMeta(card)
 	if meta.Repetition != 0 {
 		t.Errorf("Invalid repetition: %d", meta.Repetition)
 	}

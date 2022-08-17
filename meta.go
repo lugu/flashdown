@@ -41,12 +41,12 @@ func NewMeta(card Card) *Meta {
 func (c *Meta) Review(s Score) {
 	if s >= 3 {
 		if c.Repetition == 0 {
-			c.NextTime = time.Now().AddDate(0, 0, 1)
+			c.NextTime = time.Now().AddDate(0, 0, 6) // was 1
 		} else if c.Repetition == 1 {
-			c.NextTime = time.Now().AddDate(0, 0, 6)
+			c.NextTime = time.Now().AddDate(0, 0, 36) // was 6
 		} else {
 			// 6 days per successful repetition
-			sinceLastTime := float64(c.Repetition) * 6.0
+			sinceLastTime := float64(c.Repetition) * 36.0 // was 6
 			days := int(sinceLastTime * float64(c.Easiness))
 			c.NextTime = time.Now().AddDate(0, 0, days)
 		}

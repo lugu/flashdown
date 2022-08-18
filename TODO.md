@@ -18,6 +18,7 @@ Unsorted list
 - FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'
 - FEATURE: save the question in the db for debug purpose
+- FEATURE: when argument is a directory, open all markdown files.
 
 - FEATURE: --timeout <seconds> : how to long to wait before skipping a card.
 - FEATURE: investigate https://github.com/slaypni/SM-15/blob/master/sm.js

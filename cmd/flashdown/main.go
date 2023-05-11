@@ -176,11 +176,14 @@ func main() {
 		select {
 		case e := <-uiEvents:
 			switch e.ID {
-			case "s":
+			case "s", "n":
 				game.Skip()
 				if game.IsFinished() {
 					return
 				}
+				ask()
+			case "p":
+				game.Previous()
 				ask()
 			case "q", "<C-c>":
 				return

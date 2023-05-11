@@ -14,8 +14,6 @@ Unsorted list
   section. Should use a parser to split the questions. Work around, use '>' in
   front.
 
-- FEATURE: let the user specify how many cards to play with: -n <number>
-- FEATURE: implement previous with 'p'
 - FEATURE: save to file with 'w'
 - FEATURE: save the question in the db for debug purpose
 - FEATURE: when argument is a directory, open all markdown files.

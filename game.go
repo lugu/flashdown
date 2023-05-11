@@ -132,6 +132,12 @@ func (g *Game) Review(s Score) {
 	}
 }
 
+func (g *Game) Previous() {
+	if g.index > 0 {
+		g.index--
+	}
+}
+
 func (g *Game) Skip() {
 	if g.index < len(g.cards) {
 		g.index++

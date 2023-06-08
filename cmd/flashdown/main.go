@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -88,7 +89,35 @@ func main() {
 			}
 			continue
 		}
-		files = append(files, os.Args[i])
+		file := os.Args[i]
+		// If file is a directory. Add all markdown files in the directory.
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Printf("Cannot open %s: %w.\n", file, err)
+			os.Exit(1)
+		}
+		info, err := f.Stat()
+		if err != nil {
+			fmt.Printf("Cannot access %s: %w.\n", file, err)
+			os.Exit(1)
+		}
+		if info.IsDir() {
+			entries, err := f.ReadDir(-1)
+			if err != nil {
+				fmt.Printf("Cannot list files inside %s.\n", file)
+				os.Exit(1)
+			}
+			for _, entry := range entries {
+				// skip diretories
+				if entry.IsDir() || path.Ext(entry.Name()) != ".md" {
+					continue
+				}
+				filename := path.Join(path.Base(file), entry.Name())
+				files = append(files, filename)
+			}
+		} else {
+			files = append(files, file)
+		}
 	}
 
 	game, err := flashdown.NewGameFromFiles(cardsNb, files)
@@ -182,6 +211,8 @@ func main() {
 					return
 				}
 				ask()
+			case "w":
+				game.Save()
 			case "p":
 				game.Previous()
 				ask()

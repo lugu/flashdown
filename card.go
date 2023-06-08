@@ -31,6 +31,9 @@ func (c Card) Review(s Score) {
 }
 
 func splitCards(md string) []string {
+	// BUG: line matching '^#' is parsed like a question while it can be in
+	// a code section. Should use a parser to split the questions. Work
+	// around, use '>' in front.
 	return splitQuestion.Split(md, -1)
 }
 

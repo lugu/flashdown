@@ -10,9 +10,7 @@ Unsorted list
   to automate this choice when a deck/card is loaded based on the needed
   unicode).
 
-- BUG: line matching '^#' is parsed like a question while it can be in a code
-  section. Should use a parser to split the questions. Work around, use '>' in
-  front.
+- BUG: test not passing
 
 - FEATURE: save the question in the db for debug purpose
 - FEATURE: when argument is a directory, open all markdown files.

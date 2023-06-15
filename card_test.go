@@ -2,6 +2,7 @@ package flashdown
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -35,7 +36,7 @@ func TestSplitDeck(t *testing.T) {
 		t.Fatal(err)
 	}
 	if len(cards) != len(expected) {
-		t.Fatalf("wrong length: %d", len(cards))
+		t.Fatalf("Wrong length: %d", len(cards))
 	}
 	for i, card := range cards {
 		if card.Question != expected[i].Question {
@@ -46,5 +47,42 @@ func TestSplitDeck(t *testing.T) {
 			t.Errorf("Answer: %s, instead of: %s",
 				card.Answer, expected[i].Answer)
 		}
+	}
+}
+
+func TestSplitCardWithCode(t *testing.T) {
+	template := `# Title 1
+
+Text 1
+
+# Show me some code
+
+Some text
+
+%s
+# A comment
+Some code
+%s
+
+# Title 3
+
+Text 3
+`
+	deck := fmt.Sprintf(template, "```", "```")
+
+	cards := splitCards(deck)
+	if len(cards) != 3 {
+		t.Errorf("Wrong size: %d", len(cards))
+	}
+	if cards[1] != fmt.Sprintf(`# Show me some code
+
+Some text
+
+%s
+# A comment
+Some code
+%s
+`, "```", "```") {
+		t.Errorf("Wrong card: %s", cards[1])
 	}
 }

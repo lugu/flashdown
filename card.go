@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	errNoteEmpty       = errors.New("Empty note")
+	errCardEmpty       = errors.New("Empty note")
 	errQuestionMissing = errors.New("Missing question")
 	errInvalidCard     = errors.New("Invalid card")
 )
@@ -31,10 +31,31 @@ func (c Card) Review(s Score) {
 }
 
 func splitCards(md string) []string {
-	// BUG: line matching '^#' is parsed like a question while it can be in
-	// a code section. Should use a parser to split the questions. Work
-	// around, use '>' in front.
-	return splitQuestion.Split(md, -1)
+	cards := make([]string, 0)
+	isCode := false // true when parsing "```"
+	card := ""      // current card being parsed
+	lines := strings.Split(md, "\n")
+
+	for _, line := range lines {
+		if splitQuestion.Match([]byte(line)) && !isCode {
+			// 1. add previous card to the deck if any.
+			// 2. start the card with the title.
+			if card != "" {
+				cards = append(cards, card)
+			}
+			card = line
+		} else {
+			if strings.HasPrefix(line, "```") {
+				isCode = !isCode
+			}
+			// If this isn't a title, add it to the card.
+			card = fmt.Sprintf("%s\n%s", card, line)
+		}
+	}
+	if card != "" {
+		cards = append(cards, card)
+	}
+	return cards
 }
 
 func parseCards(md string) ([]Card, error) {
@@ -43,7 +64,7 @@ func parseCards(md string) ([]Card, error) {
 	sheets := splitCards(md)
 	for _, sheet := range sheets {
 		card, err := loadCard(sheet)
-		if err == errNoteEmpty {
+		if err == errCardEmpty {
 			continue
 		} else if err != nil {
 			return nil, fmt.Errorf("%w (%s)", err, sheet)
@@ -70,13 +91,14 @@ func loadCard(md string) (c Card, err error) {
 
 	md = trim(md)
 	if md == "" {
-		return c, errNoteEmpty
+		return c, errCardEmpty
 	}
 	sheets := strings.SplitN(md, "\n", 2)
 	if len(sheets) != 2 {
 		return c, errInvalidCard
 	}
-	c.Question = trim(sheets[0])
+	// Remove the '#' from the question.
+	c.Question = trim(sheets[0][1:])
 	c.Answer = trim(sheets[1])
 	c.Meta = NewMeta(c)
 	return c, nil

@@ -20,6 +20,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/nsf/termbox-go v1.1.1 // indirect
+	github.com/prataprc/goparsec v0.0.0-20211219142520-daac0e635e7e // indirect
 	github.com/srwiley/oksvg v0.0.0-20220128195007-1f435e4c2b44 // indirect
 	github.com/srwiley/rasterx v0.0.0-20220615024203-67b7089efd25 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect

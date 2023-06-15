@@ -93,12 +93,12 @@ func main() {
 		// If file is a directory. Add all markdown files in the directory.
 		f, err := os.Open(file)
 		if err != nil {
-			fmt.Printf("Cannot open %s: %w.\n", file, err)
+			fmt.Printf("Cannot open %s: %s.\n", file, err)
 			os.Exit(1)
 		}
 		info, err := f.Stat()
 		if err != nil {
-			fmt.Printf("Cannot access %s: %w.\n", file, err)
+			fmt.Printf("Cannot access %s: %s.\n", file, err)
 			os.Exit(1)
 		}
 		if info.IsDir() {

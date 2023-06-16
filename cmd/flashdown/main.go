@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -16,20 +17,25 @@ import (
 const (
 	helpQuestion = `Press space to continue, 's' to skip or 'q' to quit`
 
-	usageMsg = `Spaced repetition program for flashcards in markdown.
+	usageMsg = `Spaced repetition program for flashcards in Markdown.
 
-Usage: %s [-a] [-n <number of cards>] <deck_file> [<deck_file> ...]
+Usage: %s [-a] [-n <number of cards>] <file or directory> [<file> ...]
 Flags:
-	-a : force all cards in the deck to be used.
-	-h : show this message.
-	-n : limit the number of cards
+	-a | --all    : force all cards in the deck to be used.
+	-h | --help   : show this message.
+	-n | --number : set the number of cards used.
+	-d | --debug  : debug logs are written to a temprorary file.
 
-Deck files are plain text with heading level 1 being the question:
+A deck is a plain text Markdown file where questions have heading level 1 like:
 
     # Question 1
+
     Answer 1
+
     # Question 2
+
     Answer 2
+
     [...]
 `
 )
@@ -54,11 +60,6 @@ var (
 )
 
 func main() {
-	// file, err := ioutil.TempFile(".", "log")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// log.SetOutput(file)
 
 	if len(os.Args) < 2 {
 		fmt.Printf(usageMsg, os.Args[0])
@@ -69,15 +70,20 @@ func main() {
 	files := make([]string, 0, len(os.Args))
 
 	for i := 1; i < len(os.Args); i++ {
-		if os.Args[i] == "-h" {
-			fmt.Printf(usageMsg, os.Args[0])
-			os.Exit(0)
-		}
-		if os.Args[i] == "-a" {
+		switch os.Args[i] {
+		case "-a", "--all", "-all":
 			cardsNb = flashdown.ALL_CARDS
 			continue
-		}
-		if os.Args[i] == "-n" {
+		case "-d", "--debug", "-debug":
+			file, err := ioutil.TempFile(".", "log")
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.SetOutput(file)
+		case "-h", "--help", "-help":
+			fmt.Printf(usageMsg, os.Args[0])
+			os.Exit(0)
+		case "-n", "--number", "-number":
 			var err error
 			if i < len(os.Args) {
 				i++
@@ -89,6 +95,7 @@ func main() {
 			}
 			continue
 		}
+
 		file := os.Args[i]
 		// If file is a directory. Add all markdown files in the directory.
 		f, err := os.Open(file)

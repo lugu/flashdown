@@ -2,15 +2,15 @@
 
 Programs for [spaced repetition][1] using flashcards in [Markdown][2].
 - **Flashdown**: a terminal application
-- **Essentialist**: a GUI for desktops and mobiles
+- **Essentialist**: a GUI for desktops and mobiles (Android and iOS)
 
-The algorithm used is based on [SM-2][3].
+The space repetition algorithm used is based on [SM-2][3].
 
 Key features:
 
-- **Privacy**: Your data never leave your device. On mobile they are encrypted.
-- **Focus on edition**: It must be as easy as possible to create decks.
-- **Productivity**: Minimalist interface with keyboard navigation.
+- **No cloud**: Your data never leave your device. Privacy matters.
+- **Markdown**: Flash cards are plain text Markdown files.
+- **Keyboard shortcut**: Minimalist interface with keyboard navigation.
 
 Similar project: https://github.com/Yvee1/hascard.
 
@@ -20,19 +20,18 @@ Similar project: https://github.com/Yvee1/hascard.
 
 ## Deck syntax
 
-- A deck is a simple Markdown file (like: `my_deck.md`).
-- Questions are heading level 1 followed with their answers.
+Save and edit your flash cards with in a dead simple Markdown file (like:
+`my_deck.md`). Questions are heading level 1 followed with their answers, like:
 
 ```markdown
 # Question 1
 
-Answer 1
+Answer in Markdown.
 
 # Second __question__
 
-Answer with a **list**:
 - one
-- two
+- **two**
 - three
 
 # Third question
@@ -92,9 +91,11 @@ Press [0-5] to continue, 's' to skip or 'q' to quit
 
 ## Essentialist
 
-A GUI version for desktops and mobile **under development**.
+A GUI version for desktops and mobile (Android, iOS support isn't tested).
 
 > :warning: UTF-8 and Markdown tables are not yet supported.
+
+![Screenshot](docs/essentialist-screenshot.png)
 
 ### Desktop installation
 
@@ -103,12 +104,14 @@ go install ./cmd/essentialist
 essentialist
 ```
 
-### Mobile installation
+### Android installation
 
 ```shell
 cd cmd/essentialist
 fyne package -os android
-install Essentialist.apk
+adb install Essentialist.apk
 ```
 
-Decks are imported via local storage (ex: SD card).
+Use the local storage (of your Android device) to import flash cards. For
+example, you can put them in an SD card and import them from the Essentialist
+application.

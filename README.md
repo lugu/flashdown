@@ -16,7 +16,7 @@ Similar project: https://github.com/Yvee1/hascard.
 
 [1]: https://en.wikipedia.org/wiki/Spaced_repetition
 [2]: https://en.wikipedia.org/wiki/Markdown
-[3]: https://en.wikipedia.org/wiki/SuperMemo.
+[3]: https://en.wikipedia.org/wiki/SuperMemo#Description_of_SM-2_algorithm
 
 ## Deck syntax
 

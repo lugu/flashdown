@@ -6,28 +6,26 @@ import (
 	"time"
 )
 
-var (
-	metaInput = []Meta{
-		Meta{
-			Hash:       0,
-			NextTime:   time.Unix(0, 0),
-			Repetition: 0,
-			Easiness:   0.0,
-		},
-		Meta{
-			Hash:       1,
-			NextTime:   time.Unix(2, 0),
-			Repetition: 1,
-			Easiness:   1.0,
-		},
-		Meta{
-			Hash:       1,
-			NextTime:   time.Unix(3, 0),
-			Repetition: 1,
-			Easiness:   2.0,
-		},
-	}
-)
+var metaInput = []Meta{
+	{
+		Hash:       0,
+		NextTime:   time.Unix(0, 0),
+		Repetition: 0,
+		Easiness:   0.0,
+	},
+	{
+		Hash:       1,
+		NextTime:   time.Unix(2, 0),
+		Repetition: 1,
+		Easiness:   1.0,
+	},
+	{
+		Hash:       1,
+		NextTime:   time.Unix(3, 0),
+		Repetition: 1,
+		Easiness:   2.0,
+	},
+}
 
 func TestStrip(t *testing.T) {
 	input := []string{
@@ -73,7 +71,6 @@ func TestHash(t *testing.T) {
 }
 
 func TestMetaReview(t *testing.T) {
-
 	var card Card
 	meta := NewMeta(card)
 	if meta.Repetition != 0 {
@@ -99,7 +96,7 @@ func TestMetaReview(t *testing.T) {
 	if meta.Repetition != 1 {
 		t.Errorf("Invalid repetition: %d", meta.Repetition)
 	}
-	if time.Now().AddDate(0, 0, 1).Before(meta.NextTime) {
+	if time.Now().AddDate(0, 0, FirstRepetitionDelay).Before(meta.NextTime) {
 		t.Errorf("Invalid next time: %v", meta.NextTime)
 	}
 	if meta.Easiness > easiness {
@@ -110,7 +107,7 @@ func TestMetaReview(t *testing.T) {
 	if meta.Repetition != 2 {
 		t.Errorf("Invalid repetition: %d", meta.Repetition)
 	}
-	if time.Now().AddDate(0, 0, 6).Before(meta.NextTime) {
+	if time.Now().AddDate(0, 0, SecondRepetitionDelay).Before(meta.NextTime) {
 		t.Errorf("Invalid next time: %v", meta.NextTime)
 	}
 	if meta.Easiness != easiness {
@@ -121,11 +118,11 @@ func TestMetaReview(t *testing.T) {
 	if meta.Repetition != 3 {
 		t.Errorf("Invalid repetition: %d", meta.Repetition)
 	}
-	days := 6*2*float64(easiness) - 1
+	days := SecondRepetitionDelay*2*float64(easiness) - 1
 	if time.Now().AddDate(0, 0, int(days)).After(meta.NextTime) {
 		t.Errorf("Invalid next time: %v", meta.NextTime)
 	}
-	days = 6*2*float64(easiness) + 1
+	days = SecondRepetitionDelay*2*float64(easiness) + 1
 	if time.Now().AddDate(0, 0, int(days)).Before(meta.NextTime) {
 		t.Errorf("Invalid next time: %v", meta.NextTime)
 	}
@@ -160,11 +157,10 @@ func TestWriteRead(t *testing.T) {
 	if len(metaInput) != len(output) {
 		t.Errorf("len %d, expected: %d", len(output), len(metaInput))
 	}
-	for i, _ := range output {
+	for i := range output {
 		if metaInput[i].Hash != output[i].Hash {
 			t.Errorf("%d, Hash: %d / %d", i,
 				output[i].Hash, metaInput[i].Hash)
-
 		}
 	}
 }

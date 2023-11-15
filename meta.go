@@ -16,6 +16,9 @@ type Digest uint64
 const (
 	defaultEasiness = 2.5
 	minimumEasiness = 1.3
+
+	FirstRepetitionDelay  = 6  // was 1
+	SecondRepetitionDelay = 36 // was 6
 )
 
 // Meta contains information about the succces of a card.
@@ -38,15 +41,18 @@ func NewMeta(card Card) *Meta {
 
 // Review updates the card meta data according to the score.
 // See https://en.wikipedia.org/wiki/SuperMemo
+// FirstRepetitionDelay and SecondRepetitionDelay have been
+// modified, originally they were 1 and 6.
 func (c *Meta) Review(s Score) {
 	if s >= 3 {
-		if c.Repetition == 0 {
-			c.NextTime = time.Now().AddDate(0, 0, 6) // was 1
-		} else if c.Repetition == 1 {
-			c.NextTime = time.Now().AddDate(0, 0, 36) // was 6
-		} else {
+		switch c.Repetition {
+		case 0:
+			c.NextTime = time.Now().AddDate(0, 0, FirstRepetitionDelay)
+		case 1:
+			c.NextTime = time.Now().AddDate(0, 0, SecondRepetitionDelay)
+		default:
 			// 6 days per successful repetition
-			sinceLastTime := float64(c.Repetition) * 36.0 // was 6
+			sinceLastTime := float64(c.Repetition) * SecondRepetitionDelay
 			days := int(sinceLastTime * float64(c.Easiness))
 			c.NextTime = time.Now().AddDate(0, 0, days)
 		}

@@ -94,23 +94,41 @@ func newTopBar(leftText string, buttons ...fyne.CanvasObject) *fyne.Container {
 	return container.New(layout.NewHBoxLayout(), objects...)
 }
 
+func newErrorTopBar(app Application) *fyne.Container {
+	settings := widget.NewButton("Settings", func() {
+		app.Display(NewSettingsScreen())
+	})
+	return newTopBar("Home", settings)
+}
+
+func newHomeTopBar(app Application) *fyne.Container {
+	settings := widget.NewButton("Settings", func() {
+		app.Display(NewSettingsScreen())
+	})
+	start := widget.NewButton("Start", func() {
+		// TODO: customize the number of cards
+		var decks []*flashdown.Deck
+		// TODO: get the list of decks
+		game, err := flashdown.NewGame("all", CardsNbPerSession, decks)
+		if err != nil {
+			app.Display(NewFatalScreen(err))
+			return
+		}
+		app.Display(NewQuestionScreen(game))
+	})
+	return newTopBar("Home", start, settings)
+}
+
 func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {
 	percent := game.Success()
 	current, total := game.Progress()
 	text := fmt.Sprintf("Session: %d/%d — Success: %.0f%%",
 		current, total, percent)
-	back := widget.NewButton("Home", func() {
+	home := widget.NewButton("Home", func() {
 		game.Save()
 		app.Display(NewSplashScreen())
 	})
-	return newTopBar(text, back)
-}
-
-func newHomeTopBar(app Application) *fyne.Container {
-	back := widget.NewButton("Settings", func() {
-		app.Display(NewSettingsScreen())
-	})
-	return newTopBar("Home", back)
+	return newTopBar(text, home)
 }
 
 // bottomButton return a large button.
@@ -240,7 +258,7 @@ func loadGames() ([]*flashdown.Game, error) {
 				return
 			}
 
-			game, err := flashdown.NewGameFromAccessor(file.Name(),
+			game, err := flashdown.NewGameFromAccessors(file.Name(),
 				NewDeckAccessor(file, db))
 			if err != nil {
 				errors <- fmt.Errorf("Failed to load %s: %s",

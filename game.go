@@ -40,12 +40,16 @@ func NewGameFromFiles(cardsNb int, files []string) (*Game, error) {
 }
 
 // NewGameFromFiles reads the markdown files to instantiate a Game.
-func NewGameFromAccessor(name string, accessor DeckAccessor) (*Game, error) {
-	deck, err := NewDeck(accessor)
-	if err != nil {
-		return nil, err
+func NewGameFromAccessors(name string, accessors ...DeckAccessor) (*Game, error) {
+	var decks []*Deck
+	for _, accessor := range accessors {
+		deck, err := NewDeck(accessor)
+		if err != nil {
+			return nil, err
+		}
+		decks = append(decks, deck)
 	}
-	return NewGame(name, CARDS_TO_REVIEW, []*Deck{deck})
+	return NewGame(name, CARDS_TO_REVIEW, decks)
 }
 
 // NewGame returns a game given a set of markdown files.

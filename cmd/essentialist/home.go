@@ -11,6 +11,10 @@ import (
 	"github.com/lugu/flashdown"
 )
 
+const (
+	CardsNbPerSession = 10
+)
+
 type HomeScreen struct {
 	games []*flashdown.Game
 }

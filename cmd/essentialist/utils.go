@@ -88,11 +88,12 @@ func setDirectory(dir fyne.URI) {
 	prefs.SetString("directory", dir.String())
 }
 
-func newTopBar(text string, button *widget.Button) *fyne.Container {
-	label := widget.NewLabel(text)
-	return container.New(layout.NewHBoxLayout(), label, layout.NewSpacer(), button)
-
+func newTopBar(leftText string, buttons ...fyne.CanvasObject) *fyne.Container {
+	label := widget.NewLabel(leftText)
+	objects := append([]fyne.CanvasObject{label, layout.NewSpacer()}, buttons...)
+	return container.New(layout.NewHBoxLayout(), objects...)
 }
+
 func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {
 	percent := game.Success()
 	current, total := game.Progress()
@@ -161,7 +162,6 @@ func cleanDirectory() error {
 }
 
 func importFile(source fyne.URI) error {
-
 	decoded, err := url.PathUnescape(source.Name())
 	filename := path.Base(decoded)
 
@@ -213,7 +213,6 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 }
 
 func loadGames() ([]*flashdown.Game, error) {
-
 	files, err := storage.List(getDirectory())
 	if err != nil {
 		return nil, err

@@ -10,16 +10,16 @@ import (
 type SplashScreen struct{}
 
 func (s *SplashScreen) load(app Application) {
-	games, err := loadGames()
+	decks, err := loadDecks()
 	if err != nil {
 		app.Display(NewFatalScreen(err))
 		return
 	}
-	sort.SliceStable(games, func(i, j int) bool {
-		return games[i].Name() < games[j].Name()
+	sort.SliceStable(decks, func(i, j int) bool {
+		return decks[i].DeckName() < decks[j].DeckName()
 	})
 
-	app.Display(NewHomeScreen(games))
+	app.Display(NewHomeScreen(decks))
 }
 
 // Show a white screen until the games are loaded, then shows HomeScreen.

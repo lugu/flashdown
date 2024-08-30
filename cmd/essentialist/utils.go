@@ -101,15 +101,13 @@ func newErrorTopBar(app Application) *fyne.Container {
 	return newTopBar("Home", settings)
 }
 
-func newHomeTopBar(app Application) *fyne.Container {
+func newHomeTopBar(app Application, decks []flashdown.DeckAccessor) *fyne.Container {
 	settings := widget.NewButton("Settings", func() {
 		app.Display(NewSettingsScreen())
 	})
 	start := widget.NewButton("Start", func() {
 		// TODO: customize the number of cards
-		var decks []*flashdown.Deck
-		// TODO: get the list of decks
-		game, err := flashdown.NewGame("all", CardsNbPerSession, decks)
+		game, err := flashdown.NewGameFromAccessors("all", decks...)
 		if err != nil {
 			app.Display(NewFatalScreen(err))
 			return
@@ -230,7 +228,7 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 	return storage.ParseURI(uri)
 }
 
-func loadGames() ([]*flashdown.Game, error) {
+func loadDecks() ([]flashdown.DeckAccessor, error) {
 	files, err := storage.List(getDirectory())
 	if err != nil {
 		return nil, err
@@ -239,7 +237,7 @@ func loadGames() ([]*flashdown.Game, error) {
 	var wg sync.WaitGroup
 	wg.Add(len(files))
 
-	results := make(chan *flashdown.Game, len(files))
+	results := make(chan flashdown.DeckAccessor, len(files))
 	errors := make(chan error, len(files))
 
 	for _, file := range files {
@@ -257,29 +255,21 @@ func loadGames() ([]*flashdown.Game, error) {
 				errors <- fmt.Errorf("Failed to create URI: %s", err)
 				return
 			}
-
-			game, err := flashdown.NewGameFromAccessors(file.Name(),
-				NewDeckAccessor(file, db))
-			if err != nil {
-				errors <- fmt.Errorf("Failed to load %s: %s",
-					forHuman(file), err)
-				return
-			}
-			results <- game
+			results <- NewDeckAccessor(file, db)
 		}(file)
 	}
 	wg.Wait()
 	close(results)
 
-	games := make([]*flashdown.Game, 0)
-	for game := range results {
-		games = append(games, game)
+	accessors := make([]flashdown.DeckAccessor, 0)
+	for accessor := range results {
+		accessors = append(accessors, accessor)
 	}
 
 	select {
 	case err := <-errors:
 		return nil, err
 	default:
-		return games, nil
+		return accessors, nil
 	}
 }

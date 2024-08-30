@@ -11,16 +11,12 @@ import (
 	"github.com/lugu/flashdown"
 )
 
-const (
-	CardsNbPerSession = 10
-)
-
 type HomeScreen struct {
-	games []*flashdown.Game
+	decks []flashdown.DeckAccessor
 }
 
-func NewHomeScreen(games []*flashdown.Game) Screen {
-	return &HomeScreen{games: games}
+func NewHomeScreen(decks []flashdown.DeckAccessor) Screen {
+	return &HomeScreen{decks: decks}
 }
 
 func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
@@ -34,9 +30,16 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 
 func (s *HomeScreen) Show(app Application) {
 	window := app.Window()
-	buttons := make([]fyne.CanvasObject, len(s.games))
-	for i, g := range s.games {
-		game := g
+	buttons := make([]fyne.CanvasObject, len(s.decks))
+	for i, d := range s.decks {
+		game, err := flashdown.NewGameFromAccessors(d.DeckName(), d)
+		if err != nil {
+			// TODO: Show a message and continue
+			app.Display(NewFatalScreen(
+				fmt.Errorf("Failed to load %s: %s",
+					d.DeckName(), err)))
+			return
+		}
 		name := path.Base(game.Name())
 		label := fmt.Sprintf("%s (%.0f%%)", name, game.Success())
 		button := widget.NewButton(label, func() {
@@ -48,7 +51,7 @@ func (s *HomeScreen) Show(app Application) {
 		})
 		buttons[i] = button
 	}
-	if len(s.games) == 0 {
+	if len(s.decks) == 0 {
 		info := fmt.Sprintf("No deck found in %s",
 			getDirectory().String())
 		label := widget.NewLabel(info)
@@ -58,7 +61,7 @@ func (s *HomeScreen) Show(app Application) {
 
 	vbox := container.New(layout.NewVBoxLayout(), buttons...)
 	center := container.NewVScroll(vbox)
-	topBar := newHomeTopBar(app)
+	topBar := newHomeTopBar(app, s.decks)
 
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))

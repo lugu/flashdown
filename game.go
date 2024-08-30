@@ -65,9 +65,11 @@ func NewGame(name string, cardsNb int, decks []*Deck) (*Game, error) {
 		name:  name,
 	}
 	for i, deck := range decks {
-		cards := deck.SelectBefore(time.Now())
+		var cards []Card
 		if cardsNb == ALL_CARDS {
 			cards = deck.Cards
+		} else {
+			cards = deck.SelectBefore(time.Now())
 		}
 		game.cards = append(game.cards, cards...)
 		game.success += len(deck.Cards) - len(cards)

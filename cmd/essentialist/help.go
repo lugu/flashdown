@@ -8,16 +8,26 @@ import (
 )
 
 const (
-	helpContent = `Shortcuts:
+	helpContent = `
+----
+### Shortcuts during a session:
 
--   Escape - quit
--   Space - return the card
--   5: Perfect response
--   4: Correct response, after some hesitation
--   3: Correct response, with serious difficulty
--   2: Incorrect response, but upon seeing the answer it seemed easy to remember
--   1: Incorrect response, but upon seeing the answer it felt familiar
+-   Escape or 'q' - show home menu
+-   Space or Return - return the card to see the answer
 -   0: Total blackout
+-   1: Incorrect response, but upon seeing the answer it felt familiar
+-   2: Incorrect response, but upon seeing the answer it seemed easy to remember
+-   3: Correct response, with serious difficulty
+-   4: Correct response, after some hesitation
+-   5: Perfect response
+
+----
+### Home screen shortcuts:
+
+-   Escape or 'q' - exit
+-   Enter - start quick session
+-   'h' - show help menu
+-   's' - show settings menu
 `
 )
 
@@ -40,6 +50,7 @@ func (e *helpScreen) Show(app Application) {
 	center := container.NewVScroll(helpMessage())
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))
+	window.Canvas().SetOnTypedKey(EscapeKeyHandler(app))
 }
 
 func (e *helpScreen) Hide(app Application) {}

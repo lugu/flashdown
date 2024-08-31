@@ -135,15 +135,6 @@ func (s *SettingsScreen) newSettingsTopBar(app Application) *fyne.Container {
 	return newTopBar("Settings", back)
 }
 
-func (s *SettingsScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
-	return func(key *fyne.KeyEvent) {
-		switch key.Name {
-		case fyne.KeyQ, fyne.KeyEscape:
-			app.Display(NewSplashScreen())
-		}
-	}
-}
-
 func (s *SettingsScreen) Show(app Application) {
 	window := app.Window()
 	topBar := s.newSettingsTopBar(app)
@@ -161,7 +152,7 @@ func (s *SettingsScreen) Show(app Application) {
 		objects...))
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))
-	window.Canvas().SetOnTypedKey(s.keyHandler(app))
+	window.Canvas().SetOnTypedKey(EscapeKeyHandler(app))
 }
 
 func (s *SettingsScreen) Hide(app Application) {

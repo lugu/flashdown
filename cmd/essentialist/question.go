@@ -67,12 +67,20 @@ func NewQuestionScreen(game *flashdown.Game) Screen {
 
 func (s *QuestionScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
-		switch key.Name {
-		case fyne.KeySpace, fyne.KeyEnter:
-			app.Display(NewAnswerScreen(s.game))
-		case fyne.KeyQ, fyne.KeyEscape:
-			s.game.Save()
-			app.Display(NewSplashScreen())
+		if key.Name != "" {
+			switch key.Name {
+			case fyne.KeySpace, fyne.KeyReturn:
+				app.Display(NewAnswerScreen(s.game))
+			case fyne.KeyQ, fyne.KeyEscape:
+				s.game.Save()
+				app.Display(NewSplashScreen())
+			}
+		} else {
+			switch key.Physical {
+			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
+				s.game.Save()
+				app.Display(NewSplashScreen())
+			}
 		}
 	}
 }
@@ -132,22 +140,30 @@ func (s *AnswerScreen) reviewScore(app Application, score flashdown.Score) {
 
 func (s *AnswerScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
-		switch key.Name {
-		case fyne.Key0:
-			s.reviewScore(app, flashdown.TotalBlackout)
-		case fyne.Key1:
-			s.reviewScore(app, flashdown.IncorrectDifficult)
-		case fyne.Key2:
-			s.reviewScore(app, flashdown.IncorrectEasy)
-		case fyne.Key3:
-			s.reviewScore(app, flashdown.CorrectDifficult)
-		case fyne.Key4:
-			s.reviewScore(app, flashdown.CorrectEasy)
-		case fyne.Key5:
-			s.reviewScore(app, flashdown.PerfectRecall)
-		case fyne.KeyQ, fyne.KeyEscape:
-			s.game.Save()
-			app.Display(NewSplashScreen())
+		if key.Name != "" {
+			switch key.Name {
+			case fyne.Key0:
+				s.reviewScore(app, flashdown.TotalBlackout)
+			case fyne.Key1:
+				s.reviewScore(app, flashdown.IncorrectDifficult)
+			case fyne.Key2:
+				s.reviewScore(app, flashdown.IncorrectEasy)
+			case fyne.Key3:
+				s.reviewScore(app, flashdown.CorrectDifficult)
+			case fyne.Key4:
+				s.reviewScore(app, flashdown.CorrectEasy)
+			case fyne.Key5:
+				s.reviewScore(app, flashdown.PerfectRecall)
+			case fyne.KeyQ, fyne.KeyEscape:
+				s.game.Save()
+				app.Display(NewSplashScreen())
+			}
+		} else {
+			switch key.Physical {
+			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
+				s.game.Save()
+				app.Display(NewSplashScreen())
+			}
 		}
 	}
 }

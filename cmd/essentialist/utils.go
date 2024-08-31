@@ -119,24 +119,18 @@ func newHelpTopBar(app Application) *fyne.Container {
 }
 
 func newErrorTopBar(app Application) *fyne.Container {
-	settings := widget.NewButton("Settings", func() {
+	home := widget.NewButton("Home", func() {
 		app.Display(NewSettingsScreen())
 	})
-	return newTopBar("Home", settings)
+	return newTopBar("Error", home)
 }
 
-func newHomeTopBar(app Application, decks []flashdown.DeckAccessor) *fyne.Container {
+func newHomeTopBar(app Application, s *HomeScreen) *fyne.Container {
 	settings := widget.NewButton("Settings", func() {
 		app.Display(NewSettingsScreen())
 	})
 	start := widget.NewButton("Start", func() {
-		cardsNb := getRepetitionLenght()
-		game, err := flashdown.NewGameFromAccessors("all", cardsNb, decks...)
-		if err != nil {
-			app.Display(NewFatalScreen(err))
-			return
-		}
-		app.Display(NewQuestionScreen(game))
+		s.StartQuickSession(app)
 	})
 	help := widget.NewButton("Help", func() {
 		app.Display(NewHelpScreen())
@@ -298,5 +292,21 @@ func loadDecks() ([]flashdown.DeckAccessor, error) {
 		return nil, err
 	default:
 		return accessors, nil
+	}
+}
+
+func EscapeKeyHandler(app Application) func(*fyne.KeyEvent) {
+	return func(key *fyne.KeyEvent) {
+		if key.Name != "" {
+			switch key.Name {
+			case fyne.KeyQ, fyne.KeyEscape:
+				app.Display(NewSplashScreen())
+			}
+		} else {
+			switch key.Physical {
+			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
+				app.Display(NewSplashScreen())
+			}
+		}
 	}
 }

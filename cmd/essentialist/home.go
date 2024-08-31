@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"path"
 
 	"fyne.io/fyne/v2"
@@ -21,11 +22,41 @@ func NewHomeScreen(decks []flashdown.DeckAccessor) Screen {
 
 func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
-		switch key.Name {
-		case fyne.KeyQ, fyne.KeyEscape:
-			app.Window().Close()
+		log.Println("%v", key)
+		if key.Name != "" {
+			switch key.Name {
+			case fyne.KeyQ, fyne.KeyEscape:
+				app.Window().Close()
+			case fyne.KeyReturn:
+				s.StartQuickSession(app)
+			case fyne.KeyH:
+				app.Display(NewHelpScreen())
+			case fyne.KeyS:
+				app.Display(NewSettingsScreen())
+			}
+		} else {
+			switch key.Physical {
+			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
+				app.Window().Close()
+			case fyne.HardwareKey{ScanCode: 36}: // Enter
+				s.StartQuickSession(app)
+			case fyne.HardwareKey{ScanCode: 39}: // S
+				app.Display(NewSettingsScreen())
+			case fyne.HardwareKey{ScanCode: 43}: // H
+				app.Display(NewHelpScreen())
+			}
 		}
 	}
+}
+
+func (s *HomeScreen) StartQuickSession(app Application) {
+	cardsNb := getRepetitionLenght()
+	game, err := flashdown.NewGameFromAccessors("all", cardsNb, s.decks...)
+	if err != nil {
+		app.Display(NewErrorScreen(err))
+		return
+	}
+	app.Display(NewQuestionScreen(game))
 }
 
 func (s *HomeScreen) Show(app Application) {
@@ -36,7 +67,7 @@ func (s *HomeScreen) Show(app Application) {
 		game, err := flashdown.NewGameFromAccessors(d.DeckName(), cardsNb, d)
 		if err != nil {
 			// TODO: Show a message and continue
-			app.Display(NewFatalScreen(
+			app.Display(NewErrorScreen(
 				fmt.Errorf("Failed to load %s: %s",
 					d.DeckName(), err)))
 			return
@@ -64,7 +95,7 @@ func (s *HomeScreen) Show(app Application) {
 
 	vbox := container.New(layout.NewVBoxLayout(), buttons...)
 	center := container.NewVScroll(vbox)
-	topBar := newHomeTopBar(app, s.decks)
+	topBar := newHomeTopBar(app, s)
 
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))

@@ -12,7 +12,7 @@ type SplashScreen struct{}
 func (s *SplashScreen) load(app Application) {
 	decks, err := loadDecks()
 	if err != nil {
-		app.Display(NewFatalScreen(err))
+		app.Display(NewErrorScreen(err))
 		return
 	}
 	sort.SliceStable(decks, func(i, j int) bool {

@@ -111,6 +111,13 @@ func newTopBar(leftText string, buttons ...fyne.CanvasObject) *fyne.Container {
 	return container.New(layout.NewHBoxLayout(), objects...)
 }
 
+func newHelpTopBar(app Application) *fyne.Container {
+	home := widget.NewButton("Home", func() {
+		app.Display(NewSplashScreen())
+	})
+	return newTopBar("Help", home)
+}
+
 func newErrorTopBar(app Application) *fyne.Container {
 	settings := widget.NewButton("Settings", func() {
 		app.Display(NewSettingsScreen())
@@ -131,7 +138,10 @@ func newHomeTopBar(app Application, decks []flashdown.DeckAccessor) *fyne.Contai
 		}
 		app.Display(NewQuestionScreen(game))
 	})
-	return newTopBar("Home", start, settings)
+	help := widget.NewButton("Help", func() {
+		app.Display(NewHelpScreen())
+	})
+	return newTopBar("Home", start, help, settings)
 }
 
 func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {

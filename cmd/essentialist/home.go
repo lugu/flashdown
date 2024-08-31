@@ -42,7 +42,9 @@ func (s *HomeScreen) Show(app Application) {
 			return
 		}
 		name := path.Base(game.Name())
-		label := fmt.Sprintf("%s (%.0f%%)", name, game.Success())
+		current, total := game.Progress()
+		success := game.Success()
+		label := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
 		button := widget.NewButton(label, func() {
 			window.SetCloseIntercept(func() {
 				game.Save()

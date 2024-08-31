@@ -21,6 +21,12 @@ import (
 	"github.com/lugu/flashdown"
 )
 
+const (
+	cardsNbEntry   = "number of cards per session"
+	directoryEntry = "directory"
+	themeEntry     = "theme"
+)
+
 func getThemeName() string {
 	prefs := fyne.CurrentApp().Preferences()
 	return prefs.StringWithFallback("theme", "light")
@@ -28,7 +34,7 @@ func getThemeName() string {
 
 func getTheme() fyne.Theme {
 	prefs := fyne.CurrentApp().Preferences()
-	dir := prefs.String("theme")
+	dir := prefs.String(themeEntry)
 	switch dir {
 	case "light":
 		return theme.LightTheme()
@@ -40,7 +46,7 @@ func getTheme() fyne.Theme {
 
 func setThemeName(name string) {
 	prefs := fyne.CurrentApp().Preferences()
-	prefs.SetString("theme", name)
+	prefs.SetString(themeEntry, name)
 }
 
 func makeDefaultDirectory() (fyne.URI, error) {
@@ -62,11 +68,22 @@ func makeDefaultDirectory() (fyne.URI, error) {
 	return child, nil
 }
 
+func getRepetitionLenght() int {
+	a := fyne.CurrentApp()
+	prefs := a.Preferences()
+	return prefs.IntWithFallback(cardsNbEntry, 20)
+}
+
+func setRepetitionLenght(nbCards int) {
+	prefs := fyne.CurrentApp().Preferences()
+	prefs.SetInt(cardsNbEntry, nbCards)
+}
+
 // getDirectory return the location where to look for decks.
 func getDirectory() fyne.URI {
 	a := fyne.CurrentApp()
 	prefs := a.Preferences()
-	dir := prefs.StringWithFallback("directory", "")
+	dir := prefs.StringWithFallback(directoryEntry, "")
 	if dir != "" {
 		uri, err := storage.ParseURI(dir)
 		if err == nil {
@@ -85,7 +102,7 @@ func getDirectory() fyne.URI {
 
 func setDirectory(dir fyne.URI) {
 	prefs := fyne.CurrentApp().Preferences()
-	prefs.SetString("directory", dir.String())
+	prefs.SetString(directoryEntry, dir.String())
 }
 
 func newTopBar(leftText string, buttons ...fyne.CanvasObject) *fyne.Container {
@@ -106,8 +123,8 @@ func newHomeTopBar(app Application, decks []flashdown.DeckAccessor) *fyne.Contai
 		app.Display(NewSettingsScreen())
 	})
 	start := widget.NewButton("Start", func() {
-		// TODO: customize the number of cards
-		game, err := flashdown.NewGameFromAccessors("all", decks...)
+		cardsNb := getRepetitionLenght()
+		game, err := flashdown.NewGameFromAccessors("all", cardsNb, decks...)
 		if err != nil {
 			app.Display(NewFatalScreen(err))
 			return

@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/lugu/flashdown"
 )
 
 type SettingsScreen struct{}
@@ -51,6 +52,45 @@ func (s *SettingsScreen) changeDirectoryButton(app Application) *widget.Button {
 	return widget.NewButton("Change Directory", func() {
 		dialog.NewFolderOpen(changeDirectoryCallback, app.Window()).Show()
 	})
+}
+
+func (s *SettingsScreen) selectRepetition(app Application) *widget.Select {
+	selections := []string{
+		"10 cards",
+		"20 cards",
+		"30 cards",
+		"40 cards",
+		"50 cards",
+		"Remaining cards to learn",
+		"All cards",
+	}
+	values := []int{
+		10,
+		20,
+		30,
+		40,
+		50,
+		flashdown.CARDS_TO_REVIEW,
+		flashdown.ALL_CARDS,
+	}
+	onChange := func(selected string) {
+		for i, s := range selections {
+			if s == selected {
+				setRepetitionLenght(values[i])
+				return
+			}
+		}
+	}
+	repetitions := widget.NewSelect(selections, onChange)
+	repetitions.Alignment = fyne.TextAlignCenter
+	cardsNb := getRepetitionLenght()
+	for i, v := range values {
+		if v == cardsNb {
+			repetitions.SetSelected(selections[i])
+			break
+		}
+	}
+	return repetitions
 }
 
 func (s *SettingsScreen) switchThemeButton(app Application) *widget.Button {
@@ -108,16 +148,17 @@ func (s *SettingsScreen) Show(app Application) {
 	window := app.Window()
 	topBar := s.newSettingsTopBar(app)
 
-	buttons := make([]fyne.CanvasObject, 0)
+	objects := make([]fyne.CanvasObject, 0)
 	if fyne.CurrentDevice().IsMobile() {
-		buttons = append(buttons, s.importDirectoryButton(app))
-		buttons = append(buttons, s.cleanUpStorageButton(app))
+		objects = append(objects, s.importDirectoryButton(app))
+		objects = append(objects, s.cleanUpStorageButton(app))
 	} else {
-		buttons = append(buttons, s.changeDirectoryButton(app))
+		objects = append(objects, s.changeDirectoryButton(app))
 	}
-	buttons = append(buttons, s.switchThemeButton(app))
+	objects = append(objects, s.switchThemeButton(app))
+	objects = append(objects, s.selectRepetition(app))
 	center := container.NewVScroll(container.New(layout.NewVBoxLayout(),
-		buttons...))
+		objects...))
 	window.SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, center))
 	window.Canvas().SetOnTypedKey(s.keyHandler(app))

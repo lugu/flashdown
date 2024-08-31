@@ -31,8 +31,9 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 func (s *HomeScreen) Show(app Application) {
 	window := app.Window()
 	buttons := make([]fyne.CanvasObject, len(s.decks))
+	cardsNb := getRepetitionLenght()
 	for i, d := range s.decks {
-		game, err := flashdown.NewGameFromAccessors(d.DeckName(), d)
+		game, err := flashdown.NewGameFromAccessors(d.DeckName(), cardsNb, d)
 		if err != nil {
 			// TODO: Show a message and continue
 			app.Display(NewFatalScreen(

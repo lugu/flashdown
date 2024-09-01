@@ -14,12 +14,14 @@ const (
 
 -   Escape or 'q' - show home menu
 -   Space or Return - return the card to see the answer
--   0: Total blackout
--   1: Incorrect response, but upon seeing the answer it felt familiar
--   2: Incorrect response, but upon seeing the answer it seemed easy to remember
--   3: Correct response, with serious difficulty
--   4: Correct response, after some hesitation
--   5: Perfect response
+-   '0' - Total blackout
+-   '1' - Incorrect response, but upon seeing the answer it felt familiar
+-   '2' - Incorrect response, but upon seeing the answer it seemed easy to remember
+-   '3' - Correct response, with serious difficulty
+-   '4' - Correct response, after some hesitation
+-   '5' - Perfect response
+-   's' or 'n' - skip the card and go to the next card
+-   'p' - go to the previous card
 
 ----
 ### Home screen shortcuts:

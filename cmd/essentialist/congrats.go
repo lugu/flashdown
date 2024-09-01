@@ -27,6 +27,7 @@ func (s *CongratsScreen) Show(app Application) {
 	box := container.New(layout.NewBorderLayout(topBar, button, nil, nil),
 		topBar, button, label)
 	window.SetContent(box)
+	window.Canvas().SetOnTypedKey(EscapeKeyHandler(app))
 }
 
 func (s *CongratsScreen) Hide(app Application) {

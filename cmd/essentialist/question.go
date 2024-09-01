@@ -74,12 +74,36 @@ func (s *QuestionScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 			case fyne.KeyQ, fyne.KeyEscape:
 				s.game.Save()
 				app.Display(NewSplashScreen())
+			case fyne.KeyS, fyne.KeyN:
+				s.game.Skip()
+				if s.game.IsFinished() {
+					app.Display(NewCongratsScreen(s.game))
+				} else {
+					app.Display(NewQuestionScreen(s.game))
+				}
+			case fyne.KeyP:
+				s.game.Previous()
+				app.Display(NewQuestionScreen(s.game))
+			case fyne.KeyW:
+				s.game.Save()
 			}
 		} else {
 			switch key.Physical {
 			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
 				s.game.Save()
 				app.Display(NewSplashScreen())
+			case fyne.HardwareKey{ScanCode: 39}, fyne.HardwareKey{ScanCode: 57}: // 's' or 'n'
+				s.game.Skip()
+				if s.game.IsFinished() {
+					app.Display(NewCongratsScreen(s.game))
+				} else {
+					app.Display(NewQuestionScreen(s.game))
+				}
+			case fyne.HardwareKey{ScanCode: 33}: // 'p'
+				s.game.Previous()
+				app.Display(NewQuestionScreen(s.game))
+			case fyne.HardwareKey{ScanCode: 25}: // 'w'
+				s.game.Save()
 			}
 		}
 	}
@@ -157,12 +181,36 @@ func (s *AnswerScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 			case fyne.KeyQ, fyne.KeyEscape:
 				s.game.Save()
 				app.Display(NewSplashScreen())
+			case fyne.KeyS, fyne.KeyN:
+				s.game.Skip()
+				if s.game.IsFinished() {
+					app.Display(NewCongratsScreen(s.game))
+				} else {
+					app.Display(NewQuestionScreen(s.game))
+				}
+			case fyne.KeyP:
+				s.game.Previous()
+				app.Display(NewQuestionScreen(s.game))
+			case fyne.KeyW:
+				s.game.Save()
 			}
 		} else {
 			switch key.Physical {
 			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
 				s.game.Save()
 				app.Display(NewSplashScreen())
+			case fyne.HardwareKey{ScanCode: 39}, fyne.HardwareKey{ScanCode: 57}: // 's' or 'n'
+				s.game.Skip()
+				if s.game.IsFinished() {
+					app.Display(NewCongratsScreen(s.game))
+				} else {
+					app.Display(NewQuestionScreen(s.game))
+				}
+			case fyne.HardwareKey{ScanCode: 33}: // 'p'
+				s.game.Previous()
+				app.Display(NewQuestionScreen(s.game))
+			case fyne.HardwareKey{ScanCode: 25}: // 'w'
+				s.game.Save()
 			}
 		}
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"path"
 
 	"fyne.io/fyne/v2"
@@ -22,7 +21,6 @@ func NewHomeScreen(decks []flashdown.DeckAccessor) Screen {
 
 func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	return func(key *fyne.KeyEvent) {
-		log.Println("%v", key)
 		if key.Name != "" {
 			switch key.Name {
 			case fyne.KeyQ, fyne.KeyEscape:

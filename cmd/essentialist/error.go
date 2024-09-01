@@ -22,6 +22,7 @@ func (e *ErrorScreen) Show(app Application) {
 	vbox := container.New(layout.NewVBoxLayout(),
 		topBar, layout.NewSpacer(), errLabel)
 	app.Window().SetContent(vbox)
+	app.Window().Canvas().SetOnTypedKey(EscapeKeyHandler(app))
 }
 
 func (e *ErrorScreen) Hide(app Application) {}

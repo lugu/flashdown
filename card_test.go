@@ -18,15 +18,15 @@ func TestSplitDeck(t *testing.T) {
 7 ns,  14x L1 cache
 `
 	expected := []Card{
-		Card{
+		{
 			Question: "L1 cache reference",
 			Answer:   "0.5 ns",
 		},
-		Card{
+		{
 			Question: "Branch mispredict",
 			Answer:   "5 ns",
 		},
-		Card{
+		{
 			Question: "L2 cache reference",
 			Answer:   "7 ns,  14x L1 cache",
 		},
@@ -70,9 +70,12 @@ Text 3
 `
 	deck := fmt.Sprintf(template, "```", "```")
 
-	cards := splitCards(deck)
+	cards, lines := splitCards(deck)
 	if len(cards) != 3 {
 		t.Errorf("Wrong size: %d", len(cards))
+	}
+	if len(cards) != len(lines) {
+		t.Errorf("Each card should have a line: %d vs %d", len(cards), len(lines))
 	}
 	if cards[1] != fmt.Sprintf(`# Show me some code
 

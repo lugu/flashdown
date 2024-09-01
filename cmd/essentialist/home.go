@@ -61,28 +61,6 @@ func (s *HomeScreen) Show(app Application) {
 	window := app.Window()
 	buttons := make([]fyne.CanvasObject, len(s.decks))
 	cardsNb := getRepetitionLenght()
-	for i, d := range s.decks {
-		game, err := flashdown.NewGameFromAccessors(d.DeckName(), cardsNb, d)
-		if err != nil {
-			// TODO: Show a message and continue
-			app.Display(NewErrorScreen(
-				fmt.Errorf("Failed to load %s: %s",
-					d.DeckName(), err)))
-			return
-		}
-		name := path.Base(game.Name())
-		current, total := game.Progress()
-		success := game.Success()
-		label := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
-		button := widget.NewButton(label, func() {
-			window.SetCloseIntercept(func() {
-				game.Save()
-				window.Close()
-			})
-			app.Display(NewQuestionScreen(game))
-		})
-		buttons[i] = button
-	}
 	if len(s.decks) == 0 {
 		info := fmt.Sprintf("No deck found in %s",
 			getDirectory().String())
@@ -91,12 +69,38 @@ func (s *HomeScreen) Show(app Application) {
 		buttons = append(buttons, label)
 	}
 
-	vbox := container.New(layout.NewVBoxLayout(), buttons...)
-	center := container.NewVScroll(vbox)
+	list := widget.NewList(
+		func() int {
+			return len(buttons)
+		},
+		func() fyne.CanvasObject {
+			return widget.NewButton("template", func() {})
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			deck := s.decks[i]
+			deckName := deck.DeckName()
+			game, err := flashdown.NewGameFromAccessors(deckName, cardsNb, deck)
+			if err != nil {
+				// instead of unwrap, show line number
+				o.(*widget.Button).SetText(fmt.Sprintf("Failed to load %s: %s", deckName, err))
+				return
+			}
+			name := path.Base(game.Name())
+			current, total := game.Progress()
+			success := game.Success()
+			label := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
+			o.(*widget.Button).SetText(label)
+			o.(*widget.Button).OnTapped = func() {
+				window.SetCloseIntercept(func() {
+					game.Save()
+					window.Close()
+				})
+				app.Display(NewQuestionScreen(game))
+			}
+		})
 	topBar := newHomeTopBar(app, s)
-
 	window.SetContent(container.New(layout.NewBorderLayout(
-		topBar, nil, nil, nil), topBar, center))
+		topBar, nil, nil, nil), topBar, list))
 	window.Canvas().SetOnTypedKey(s.keyHandler(app))
 }
 

@@ -15,9 +15,7 @@ var (
 	errInvalidCard     = errors.New("Invalid card")
 )
 
-var (
-	splitQuestion = regexp.MustCompile(`(?m)^#\s*`)
-)
+var splitQuestion = regexp.MustCompile(`(?m)^#\s*`)
 
 type Card struct {
 	Question string
@@ -30,19 +28,24 @@ func (c Card) Review(s Score) {
 	c.Meta.Review(s)
 }
 
-func splitCards(md string) []string {
+// splitCards take a mardown string as input and returns a set of cards and the line number of each.
+func splitCards(md string) ([]string, []int) {
 	cards := make([]string, 0)
+	cardsLineNb := make([]int, 0)
 	isCode := false // true when parsing "```"
 	card := ""      // current card being parsed
+	cardLineNb := 0 // current card line number
 	lines := strings.Split(md, "\n")
 
-	for _, line := range lines {
+	for i, line := range lines {
 		if splitQuestion.Match([]byte(line)) && !isCode {
 			// 1. add previous card to the deck if any.
 			// 2. start the card with the title.
 			if card != "" {
 				cards = append(cards, card)
+				cardsLineNb = append(cardsLineNb, cardLineNb)
 			}
+			cardLineNb = i
 			card = line
 		} else {
 			if strings.HasPrefix(line, "```") {
@@ -54,20 +57,21 @@ func splitCards(md string) []string {
 	}
 	if card != "" {
 		cards = append(cards, card)
+		cardsLineNb = append(cardsLineNb, cardLineNb)
 	}
-	return cards
+	return cards, cardsLineNb
 }
 
 func parseCards(md string) ([]Card, error) {
 	cards := make([]Card, 0)
 
-	sheets := splitCards(md)
-	for _, sheet := range sheets {
+	sheets, lines := splitCards(md)
+	for i, sheet := range sheets {
 		card, err := loadCard(sheet)
 		if err == errCardEmpty {
 			continue
 		} else if err != nil {
-			return nil, fmt.Errorf("%w (%s)", err, sheet)
+			return nil, fmt.Errorf("%w (line %d)", err, lines[i])
 		}
 		cards = append(cards, card)
 	}
@@ -88,7 +92,6 @@ func trim(s string) string {
 
 // loadCard parse a card description
 func loadCard(md string) (c Card, err error) {
-
 	md = trim(md)
 	if md == "" {
 		return c, errCardEmpty

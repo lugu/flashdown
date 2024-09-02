@@ -130,7 +130,7 @@ func newHomeTopBar(app Application, s *HomeScreen) *fyne.Container {
 		app.Display(NewSettingsScreen())
 	})
 	start := widget.NewButton("Start", func() {
-		s.StartQuickSession(app)
+		s.startQuickSession(app)
 	})
 	help := widget.NewButton("Help", func() {
 		app.Display(NewHelpScreen())

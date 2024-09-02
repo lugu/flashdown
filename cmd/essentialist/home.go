@@ -26,7 +26,7 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 			case fyne.KeyQ, fyne.KeyEscape:
 				app.Window().Close()
 			case fyne.KeyReturn:
-				s.StartQuickSession(app)
+				s.startQuickSession(app)
 			case fyne.KeyH:
 				app.Display(NewHelpScreen())
 			case fyne.KeyS:
@@ -37,7 +37,7 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 			case fyne.HardwareKey{ScanCode: 9}, fyne.HardwareKey{ScanCode: 24}: // Escape
 				app.Window().Close()
 			case fyne.HardwareKey{ScanCode: 36}: // Enter
-				s.StartQuickSession(app)
+				s.startQuickSession(app)
 			case fyne.HardwareKey{ScanCode: 39}: // S
 				app.Display(NewSettingsScreen())
 			case fyne.HardwareKey{ScanCode: 43}: // H
@@ -47,7 +47,7 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 	}
 }
 
-func (s *HomeScreen) StartQuickSession(app Application) {
+func (s *HomeScreen) startQuickSession(app Application) {
 	cardsNb := getRepetitionLenght()
 	game, err := flashdown.NewGameFromAccessors("all", cardsNb, s.decks...)
 	if err != nil {

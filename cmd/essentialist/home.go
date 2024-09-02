@@ -57,21 +57,17 @@ func (s *HomeScreen) startQuickSession(app Application) {
 	app.Display(NewQuestionScreen(game))
 }
 
-func (s *HomeScreen) Show(app Application) {
-	window := app.Window()
-	buttons := make([]fyne.CanvasObject, len(s.decks))
-	cardsNb := getRepetitionLenght()
+func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 	if len(s.decks) == 0 {
-		info := fmt.Sprintf("No deck found in %s",
-			getDirectory().String())
+		info := fmt.Sprintf("No deck found in %s", getDirectory().String())
 		label := widget.NewLabel(info)
 		label.Wrapping = fyne.TextWrapBreak
-		buttons = append(buttons, label)
+		return label
 	}
-
+	cardsNb := getRepetitionLenght()
 	list := widget.NewList(
 		func() int {
-			return len(buttons)
+			return len(s.decks)
 		},
 		func() fyne.CanvasObject {
 			return widget.NewButton("template", func() {})
@@ -91,17 +87,22 @@ func (s *HomeScreen) Show(app Application) {
 			label := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
 			o.(*widget.Button).SetText(label)
 			o.(*widget.Button).OnTapped = func() {
-				window.SetCloseIntercept(func() {
+				app.Window().SetCloseIntercept(func() {
 					game.Save()
-					window.Close()
+					app.Window().Close()
 				})
 				app.Display(NewQuestionScreen(game))
 			}
 		})
+	return list
+}
+
+func (s *HomeScreen) Show(app Application) {
 	topBar := newHomeTopBar(app, s)
-	window.SetContent(container.New(layout.NewBorderLayout(
+	list := s.deckList(app)
+	app.Window().SetContent(container.New(layout.NewBorderLayout(
 		topBar, nil, nil, nil), topBar, list))
-	window.Canvas().SetOnTypedKey(s.keyHandler(app))
+	app.Window().Canvas().SetOnTypedKey(s.keyHandler(app))
 }
 
 func (s *HomeScreen) Hide(app Application) {

@@ -4,6 +4,8 @@
 - [ ] BUG: Essentialist doesn't show the real number of cards in the deck
 - [ ] BUG: Essentialist when starting a 100% deck, the question "no cards" is shown!?
 - [ ] BUG: When an element from the home list is focussed, shortcuts don't work
+- [ ] BUG: Essentialist: Recursive search on the directory
+- [ ] BUG: DNS and Github: book the name Essentialist and flashdown
 
   - When pressing tab to circle the focussed element, the canvas TypeKey
   handler isn't called anymore and it isn't active anymore (pressing 'h'

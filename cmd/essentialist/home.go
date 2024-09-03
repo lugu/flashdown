@@ -12,11 +12,17 @@ import (
 )
 
 type HomeScreen struct {
-	decks []flashdown.DeckAccessor
+	decks   []flashdown.DeckAccessor
+	games   []*flashdown.Game
+	cardsNb int
 }
 
 func NewHomeScreen(decks []flashdown.DeckAccessor) Screen {
-	return &HomeScreen{decks: decks}
+	return &HomeScreen{
+		decks:   decks,
+		games:   make([]*flashdown.Game, len(decks)),
+		cardsNb: getRepetitionLenght(),
+	}
 }
 
 func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
@@ -48,13 +54,27 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 }
 
 func (s *HomeScreen) startQuickSession(app Application) {
-	cardsNb := getRepetitionLenght()
-	game, err := flashdown.NewGameFromAccessors("all", cardsNb, s.decks...)
+	game, err := flashdown.NewGameFromAccessors("all", s.cardsNb, s.decks...)
 	if err != nil {
 		app.Display(NewErrorScreen(err))
 		return
 	}
 	app.Display(NewQuestionScreen(game))
+}
+
+func (s *HomeScreen) updateDeckButton(app Application, label *widget.Label, deck flashdown.DeckAccessor) *flashdown.Game {
+	deckName := deck.DeckName()
+	game, err := flashdown.NewGameFromAccessors(deckName, s.cardsNb, deck)
+	if err != nil {
+		label.SetText(fmt.Sprintf("Failed to load %s: %s", deckName, err))
+		return nil
+	}
+	name := path.Base(game.Name())
+	current, total := game.Progress()
+	success := game.Success()
+	content := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
+	label.SetText(content)
+	return game
 }
 
 func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
@@ -64,36 +84,19 @@ func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 		label.Wrapping = fyne.TextWrapBreak
 		return label
 	}
-	cardsNb := getRepetitionLenght()
 	list := widget.NewList(
 		func() int {
 			return len(s.decks)
 		},
 		func() fyne.CanvasObject {
-			return widget.NewButton("template", func() {})
+			return widget.NewLabel("")
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			deck := s.decks[i]
-			deckName := deck.DeckName()
-			game, err := flashdown.NewGameFromAccessors(deckName, cardsNb, deck)
-			if err != nil {
-				// instead of unwrap, show line number
-				o.(*widget.Button).SetText(fmt.Sprintf("Failed to load %s: %s", deckName, err))
-				return
-			}
-			name := path.Base(game.Name())
-			current, total := game.Progress()
-			success := game.Success()
-			label := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
-			o.(*widget.Button).SetText(label)
-			o.(*widget.Button).OnTapped = func() {
-				app.Window().SetCloseIntercept(func() {
-					game.Save()
-					app.Window().Close()
-				})
-				app.Display(NewQuestionScreen(game))
-			}
+			s.games[i] = s.updateDeckButton(app, o.(*widget.Label), s.decks[i])
 		})
+	list.OnSelected = func(id widget.ListItemID) {
+		app.Display(NewQuestionScreen(s.games[id]))
+	}
 	return list
 }
 

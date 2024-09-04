@@ -1,4 +1,17 @@
 
+## Launch criteria
+
+- [ ] No usability bugs
+- [ ] Essentialist supports tables
+- [ ] CI generate binaries for Windows, Mac and Linux
+- [ ] Install instructions tested on Windows, Mac and Linux
+- [ ] Logo has been decided
+- [x] Github domain is registered
+- [ ] App tested on Android, Windows and Mac
+- [ ] Ask feedback from 3 users
+
+## TODO
+
 - [ ] FEATURE: add a timer (count down), per flashcard. After X seconds, the
    card is blank for 5s, then it shows the response.
 - [ ] BUG: Essentialist doesn't show the real number of cards in the deck

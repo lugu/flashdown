@@ -141,8 +141,8 @@ func newHomeTopBar(app Application, s *HomeScreen) *fyne.Container {
 func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {
 	percent := game.Success()
 	current, total := game.Progress()
-	text := fmt.Sprintf("Session: %d/%d — Success: %.0f%%",
-		current, total, percent)
+	text := fmt.Sprintf("Session: %d/%d — Success: %.0f%% — %s",
+		current, total, percent, game.DeckName())
 	home := widget.NewButton("Home", func() {
 		game.Save()
 		app.Display(NewSplashScreen())

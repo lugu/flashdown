@@ -1,58 +1,45 @@
+## Public Repo launch milestone
 
-## Launch criteria
-
-- [ ] No usability bugs
-- [ ] Essentialist supports tables
-- [ ] CI generate binaries for Windows, Mac and Linux
-- [ ] Install instructions tested on Windows, Mac and Linux
-- [ ] Logo has been decided
 - [x] Github domain is registered
+- [x] DNS name Essentialist.app is registered
+- [ ] CI generate daily builds for Windows, Mac, Linux and Android
+- [ ] Install instructions tested on Windows, Mac and Linux
+- [ ] App runs on Linux, Mac and Windows
+- [ ] Decision on the format: `#` vs `##`
+
+## Distro launch milestone
+
+- [ ] Document how to report bugs and features
+- [ ] No usability bugs
+- [ ] GUI supports tables
+- [ ] GUI supports CJK option
+- [ ] Logo has been decided
 - [ ] App tested on Android, Windows and Mac
-- [ ] Ask feedback from 3 users
+- [ ] CI to create release from tag
+- [ ] Release published with binaries
+- [ ] Packages for flatpack or snap exists
+- [ ] Arch AUR package
 
-## TODO
+## App store launch milestone
 
-- [ ] FEATURE: add a timer (count down), per flashcard. After X seconds, the
-   card is blank for 5s, then it shows the response.
-- [ ] BUG: Essentialist doesn't show the real number of cards in the deck
-- [ ] BUG: Essentialist when starting a 100% deck, the question "no cards" is shown!?
-- [ ] BUG: When an element from the home list is focussed, shortcuts don't work
-- [ ] BUG: Essentialist: Recursive search on the directory
-- [ ] BUG: DNS and Github: book the name Essentialist and flashdown
+- [ ] GUI supports binary mode (correct/incorrect)
+- [ ] Basic website at <https://essentialist.app>
+- [ ] Ask feedback from 3 users at r/GetStudying and r/spacedrepetition/
+- [ ] App tested on low end Android and different emulators
+- [ ] Instructions to load and save cards from micro sd
+- [ ] Decision on gamification: star hunter?
+- [ ] License page is setup
+- [ ] F-droid version
 
-  - When pressing tab to circle the focussed element, the canvas TypeKey
-  handler isn't called anymore and it isn't active anymore (pressing 'h'
-  doesn't works).
+## Unsorted TODO list
 
-  - List's TypeKey method is only called when focus is given to the whole list.
-  In this case, the buttons aren't focussed. This is done by pressing tab 4
-  times (before the first element get high lighted). Strangely, when pressing
-  up and down on the list focussed, it scrolls the list without highlighting
-  any element.
-
-  - The focussed element get its TypedKey method called instead of the canvas
-  TypedKey method.
-
-  - Requirements:
-
-    - Menu short cuts work ('s', 'h', 'quick-session')
-    - List navigation is works with up/down
-    - List entry re-act to 'enter' and 'space' to start a session.
-
-  - Options
-
-    - Option 1: Cannot override all the widgets TypedKey handler (ex: button)
-    - Option 2: Prevent all the widgets TypedKey handler from being called when focussed.
-    - Option 3: Replace list buttons with non focusable element (ex: labels)
-
-From the definition of `processKeyPressed`  at `v2@v2.5.1/internal/driver/glfw/window.go`:
-
-```go
- // No shortcut detected, pass down to TypedKey
- focused := w.canvas.Focused()
- if focused != nil {
-  w.QueueEvent(func() { focused.TypedKey(keyEvent) })
- } else if w.canvas.onTypedKey != nil {
-  w.QueueEvent(func() { w.canvas.onTypedKey(keyEvent) })
- }
-```
+- BUG: GUI doesn't show the real number of cards in the deck
+- BUG: GUI when starting a 100% deck, the question "no cards" is shown!?
+- BUG: When an element from the home list is focussed, shortcuts don't work
+- FEATURE: GUI: Recursive search on the directory
+- FEATURE: Add option to load a Chinese / Japanese / Korean font (and
+create a bug to automate this choice when a deck/card is loaded based on the
+needed unicode).
+- BUG: when argument is a relative directory directory (`~` or `..`), it fails
+- FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
+- FEATURE: Complete help with about & licence

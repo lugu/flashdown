@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="12.7mm"
+   height="12.7mm"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="/home/ludovicguegan/src/flashdown/cmd/gui/flashdown/icon.png"
+   inkscape:export-xdpi="256"
+   inkscape:export-ydpi="256"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="false"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="mm"
+     showguides="true"
+     borderlayer="false"
+     inkscape:showpageshadow="true"
+     showborder="true"
+     inkscape:zoom="8"
+     inkscape:cx="36.4375"
+     inkscape:cy="45.5625"
+     inkscape:window-width="1918"
+     inkscape:window-height="1062"
+     inkscape:window-x="0"
+     inkscape:window-y="16"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     objecttolerance="1"
+     guidetolerance="1" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="powerclip"
+       id="path-effect16472"
+       is_visible="true"
+       lpeversion="1"
+       inverse="true"
+       flatten="false"
+       hide_clip="false"
+       message="Use fill-rule evenodd on &lt;b&gt;fill and stroke&lt;/b&gt; dialog if no flatten result after convert clip to paths." />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath9519">
+      <rect
+         style="display:inline;mix-blend-mode:normal;fill:#6b6b6b;fill-opacity:0.522374;fill-rule:nonzero;stroke:none;stroke-width:1.20838;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         id="rect9521"
+         width="7.5233116"
+         height="4.865221"
+         x="-4.3049979"
+         y="7.5376935"
+         rx="3.0432127e-17"
+         transform="matrix(0.9997245,-0.02347185,-0.02346753,0.9997246,0,0)"
+         inkscape:label="shadow" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath9519-3">
+      <rect
+         style="display:inline;mix-blend-mode:normal;fill:#6b6b6b;fill-opacity:0.522374;fill-rule:nonzero;stroke:none;stroke-width:1.20838;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         id="rect9521-5"
+         width="12.305078"
+         height="7.8027368"
+         x="-5.042758"
+         y="7.5436339"
+         rx="2.2519805"
+         transform="matrix(0.9997245,-0.02347185,-0.02346753,0.9997246,0,0)"
+         inkscape:label="shadow"
+         ry="0.94362503" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath16468">
+      <rect
+         style="display:none;fill:#9f792e;fill-opacity:0.554967;stroke:none;stroke-width:2.402;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.494102;paint-order:markers fill stroke"
+         id="rect16470"
+         width="7.5905933"
+         height="7.7026434"
+         x="-3.338042"
+         y="3.8386104"
+         rx="1.1809096"
+         ry="1.0033178"
+         inkscape:label="shadow"
+         clip-path="url(#clipPath9519-3)"
+         d="m -2.1571324,3.8386104 h 5.2287741 c 0.6542239,0 1.1809096,0.4474798 1.1809096,1.0033178 v 5.6960078 c 0,0.555838 -0.5266857,1.003318 -1.1809096,1.003318 h -5.2287741 c -0.6542239,0 -1.1809096,-0.44748 -1.1809096,-1.003318 V 4.8419282 c 0,-0.555838 0.5266857,-1.0033178 1.1809096,-1.0033178 z" />
+      <path
+         id="lpe_path-effect16472"
+         style="display:inline;fill:#9f792e;fill-opacity:0.554967;stroke:none;stroke-width:2.402;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.494102;paint-order:markers fill stroke"
+         class="powerclip"
+         d="M -10.037879,2.6367998 H 7.9513502 V 18.167705 H -10.037879 Z m 7.8807466,1.2018106 c -0.6542239,0 -1.1809096,0.4474798 -1.1809096,1.0033178 v 5.6960078 c 0,0.555838 0.5266857,1.003318 1.1809096,1.003318 h 5.2287741 c 0.6542239,0 1.1809096,-0.44748 1.1809096,-1.003318 V 4.8419282 c 0,-0.555838 -0.5266857,-1.0033178 -1.1809096,-1.0033178 z" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="layer"
+     style="display:inline">
+    <path
+       style="display:inline;fill:#006c50;fill-opacity:1;stroke:none;stroke-width:1.102;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.426481;paint-order:markers fill stroke"
+       id="rect2878"
+       width="7.9892297"
+       height="5.5309052"
+       x="-5.0378795"
+       y="7.6367998"
+       rx="0.53191847"
+       transform="rotate(-44.88773)"
+       inkscape:label="bottom"
+       ry="0.64789838"
+       clip-path="url(#clipPath16468)"
+       inkscape:path-effect="#path-effect16472"
+       d="m -4.505961,7.6367998 h 6.9253927 c 0.2946829,0 0.5319185,0.2889627 0.5319185,0.6478984 v 4.2351088 c 0,0.358935 -0.2372356,0.647898 -0.5319185,0.647898 H -4.505961 c -0.2946828,0 -0.5319185,-0.288963 -0.5319185,-0.647898 V 8.2846982 c 0,-0.3589357 0.2372357,-0.6478984 0.5319185,-0.6478984 z"
+       sodipodi:type="rect" />
+    <rect
+       style="display:inline;fill:#002b6c;fill-opacity:1;stroke:none;stroke-width:1.102;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.426481;paint-order:markers fill stroke"
+       id="rect14530"
+       width="7.9892297"
+       height="5.5309052"
+       x="-2.564286"
+       y="5.2029452"
+       rx="0.53191847"
+       transform="rotate(-44.88773)"
+       inkscape:label="top"
+       ry="0.64789838" />
+  </g>
+  <metadata
+     id="metadata9">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

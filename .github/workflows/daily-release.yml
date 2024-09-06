@@ -1,8 +1,9 @@
-name: Daily build
+name: Manual build
 
-on:
-  schedule:
-    - cron: "0 0 * * *" # Runs daily at midnight UTC
+# on:
+#   schedule:
+#     - cron: "0 0 * * *" # Runs daily at midnight UTC
+on: workflow_dispatch
 
 permissions:
   contents: read
@@ -10,35 +11,104 @@ permissions:
 
 jobs:
 
-  build-and-upload:
+  build-for-linux:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-   
+    - uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+
     - name: Install X11 headers
       run: sudo apt-get install -y libgl1-mesa-dev xorg-dev
-   
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-       go-version: 'stable'
-       cache: false
 
-    - name: Display the release tag
-      run: echo ${{ github.sha }} # Use commit SHA as tag
-   
-    - name: Test
-      run: go test -v .
-   
-    - name: Build
-      run: go build -v ./cmd/essentialist
+    - name: Build essentialist
+      run: go build ./cmd/essentialist
 
-    - name: List the executable
-      run: ls -l ./essentialist
-   
-    - name: Upload Artifacts
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Linux daily build
+        name: Essentialist for Linux (amd64)
         path: ./essentialist
+
+  build-for-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r27
+        add-to-path: false
+    - uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+
+    - name: Install fyne
+      run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+    - name: Build essentialist
+      run: cd cmd/essentialist && ~/go/bin/fyne package -os android && cp Essentialist.apk ../.. && cd -
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Essentialist for Android (APK)
+        path: ./Essentialist.apk
+
+  build-for-mac-os:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build essentialist (intel)
+        run: go build -o ./essentialist-intel ./cmd/essentialist
+        env:
+          CGO_ENABLED: 1
+          GOARCH: amd64
+
+      - name: Build essentialist (arm64)
+        run: go build -o ./essentialist-arm64 ./cmd/essentialist
+        env:
+          CGO_ENABLED: 1
+          GOARCH: arm64
+
+      - name: Upload Artifact (intel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Essentialist for MacOS (intel)
+          path: ./essentialist-intel
+
+      - name: Upload Artifact (arm64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Essentialist for MacOS (arm64)
+          path: ./essentialist-arm64
+
+  build-for-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build essentialist
+        run: go build -x -o essentialist.exe ./cmd/essentialist
+
+      - name: DELETE ME
+        run: ls -l .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Essentialist for Windows (x64)
+          path: ./essentialist.exe

@@ -6,6 +6,7 @@
 - [x] App runs on Linux, Mac and Windows
 - [x] Build instructions tested on Windows, Mac and Linux
 - [ ] Automate release publication using tags
+- [ ] Declare project at Google
 - [ ] Decision on the format: `#` vs `##`
 
 ## Distro launch milestone

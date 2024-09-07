@@ -8,7 +8,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/lugu/flashdown"
+
+	flashdown "github.com/lugu/flashdown/internal"
 )
 
 type SettingsScreen struct{}

@@ -5,7 +5,8 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/storage"
-	"github.com/lugu/flashdown"
+
+	flashdown "github.com/lugu/flashdown/internal"
 )
 
 type uriDeckAccessor struct {

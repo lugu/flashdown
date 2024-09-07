@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -11,7 +10,7 @@ import (
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
-	"github.com/lugu/flashdown"
+	flashdown "github.com/lugu/flashdown/internal"
 )
 
 const (
@@ -60,7 +59,6 @@ var (
 )
 
 func main() {
-
 	if len(os.Args) < 2 {
 		fmt.Printf(usageMsg, os.Args[0])
 		os.Exit(1)
@@ -75,7 +73,7 @@ func main() {
 			cardsNb = flashdown.ALL_CARDS
 			continue
 		case "-d", "--debug", "-debug":
-			file, err := ioutil.TempFile(".", "log")
+			file, err := os.CreateTemp(".", "log")
 			if err != nil {
 				log.Fatal(err)
 			}

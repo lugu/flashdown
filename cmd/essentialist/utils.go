@@ -18,7 +18,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/lugu/flashdown"
+	flashdown "github.com/lugu/flashdown/internal"
 )
 
 const (

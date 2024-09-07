@@ -3,8 +3,9 @@
 - [x] Github domain is registered
 - [x] DNS name Essentialist.app is registered
 - [x] CI generate builds for Windows, Mac, Linux and Android
-- [ ] Install instructions tested on Windows, Mac and Linux
-- [ ] App runs on Linux, Mac and Windows
+- [x] App runs on Linux, Mac and Windows
+- [x] Build instructions tested on Windows, Mac and Linux
+- [ ] Automate release publication using tags
 - [ ] Decision on the format: `#` vs `##`
 
 ## Distro launch milestone

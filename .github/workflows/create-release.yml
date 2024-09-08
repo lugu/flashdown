@@ -6,154 +6,24 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
+  build-artifacts:
+    uses: ./.github/workflows/build-artifacts.yml
+    secrets: inherit
 
   create-release:
+    needs: build-artifacts
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Fetch artifcats
+        uses: actions/download-artifact@v4
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: DELETE_ME
+        run: ls -l *
+
+      - uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-  build-for-linux:
-    runs-on: ubuntu-latest
-    needs: create-release
-
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
-      with:
-        go-version: 'stable'
-
-    - name: Install X11 headers
-      run: sudo apt-get install -y libgl1-mesa-dev xorg-dev
-
-    - name: Build essentialist
-      run: go build ./cmd/essentialist
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./essentialist
-        asset_name: Essentialist for Linux
-        asset_content_type: application/octet-stream
-
-  build-for-android:
-    runs-on: ubuntu-latest
-    needs: create-release
-
-    steps:
-    - uses: actions/checkout@v4
-    - uses: nttld/setup-ndk@v1
-      id: setup-ndk
-      with:
-        ndk-version: r27
-        add-to-path: false
-    - uses: actions/setup-go@v5
-      with:
-        go-version: 'stable'
-
-    - name: Install fyne
-      run: go install fyne.io/fyne/v2/cmd/fyne@latest
-
-    - name: Build essentialist
-      run: cd cmd/essentialist && ~/go/bin/fyne package -os android && cp Essentialist.apk ../.. && cd -
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        retention-days: 30
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_name: Essentialist for Android (APK)
-        asset_path: ./Essentialist.apk
-        asset_content_type: application/zip
-
-  build-for-mac-os:
-    runs-on: macos-latest
-    needs: create-release
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: 'stable'
-
-      - name: Build essentialist (intel)
-        run: go build -o ./essentialist-intel ./cmd/essentialist
-        env:
-          CGO_ENABLED: 1
-          GOARCH: amd64
-
-      - name: Build essentialist (arm64)
-        run: go build -o ./essentialist-arm64 ./cmd/essentialist
-        env:
-          CGO_ENABLED: 1
-          GOARCH: arm64
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: Essentialist for MacOS (intel)
-          asset_path: ./essentialist-intel
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: Essentialist for MacOS (arm64)
-          asset_path: ./essentialist-arm64
-          asset_content_type: application/octet-stream
-
-  build-for-windows:
-    runs-on: windows-latest
-    needs: create-release
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: 'stable'
-
-      - name: Build essentialist
-        run: go build -x -o essentialist.exe ./cmd/essentialist
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: Essentialist for Windows (x64)
-          asset_path: ./essentialist.exe
-          asset_content_type: application/octet-stream
+          artifacts: "Essentialist for Linux (amd64)/essentialist-linux,Essentialist for Windows (x64)/essentialist.exe,Essentialist for MacOS (arm64)/essentialist-mac-os-arm64,Essentialist for MacOS (intel)/essentialist-mac-os-intel,Essentialist for Android (APK)/Essentialist.apk"

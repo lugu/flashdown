@@ -5,7 +5,7 @@
 - [x] CI generate builds for Windows, Mac, Linux and Android
 - [x] App runs on Linux, Mac and Windows
 - [x] Build instructions tested on Windows, Mac and Linux
-- [ ] Automate release publication using tags
+- [x] Automate release publication using tags
 - [ ] Declare project at Google
 - [ ] Decision on the format: `#` vs `##`
 

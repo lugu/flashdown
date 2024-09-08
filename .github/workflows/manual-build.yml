@@ -1,8 +1,5 @@
 name: Manual build
 
-# on:
-#   schedule:
-#     - cron: "0 0 * * *" # Runs daily at midnight UTC
 on: workflow_dispatch
 
 permissions:
@@ -103,9 +100,6 @@ jobs:
 
       - name: Build essentialist
         run: go build -x -o essentialist.exe ./cmd/essentialist
-
-      - name: DELETE ME
-        run: ls -l .
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

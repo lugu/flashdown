@@ -17,13 +17,16 @@ Key features:
 [2]: https://en.wikipedia.org/wiki/Markdown
 [3]: https://en.wikipedia.org/wiki/SuperMemo#Description_of_SM-2_algorithm
 
+See the [CONTRIBUTING.md](/.github/CONTRIBUTING.md) for how to report bugs and
+submit pull request.
+
 ## Flash cards syntax
 
 Each deck of cards is a plain text Markdown files with the extension `.md` (ex:
 `sample.md`). You can put all your decks in the same directory.
 
 Each card starts with a heading level 2 (line starting with `##`) defining the
-question. The answer is the content following (until the next heading level 1).
+question. The answer is the content following (until the next heading level 2).
 
 You progress is stored in a hidden file `.<deck file>.db` (ex: `.sample.md.db`).
 

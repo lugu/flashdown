@@ -11,7 +11,7 @@
 
 ## Distro launch milestone
 
-- [ ] Document how to report bugs and features
+- [x] Document how to report bugs and features
 - [ ] No usability bugs
 - [ ] GUI supports tables
 - [ ] GUI supports CJK option

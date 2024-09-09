@@ -30,7 +30,7 @@ Be respectful and considerate of your fellow contributors.
 
 Flashdown loosely follows semantic versioning with some exceptions:
 
-* Internal API: The go package github.com/lugu/flashdown is considered internal
+* Internal API: The go package github.com/lugu/flashdown/internal is internal
 and not subject to semantic versioning.
 * Major Version Changes: Incompatible changes related to:
   * Supported platforms

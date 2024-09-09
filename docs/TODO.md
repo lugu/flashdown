@@ -12,9 +12,9 @@
 ## Distro launch milestone
 
 - [x] Document how to report bugs and features
+- [x] GUI supports CJK option
 - [ ] No usability bugs
 - [ ] GUI supports tables
-- [ ] GUI supports CJK option
 - [ ] Logo has been decided
 - [ ] App tested on Android, Windows and Mac
 - [ ] CI to create release from tag
@@ -38,10 +38,7 @@
 - BUG: GUI doesn't show the real number of cards in the deck
 - BUG: GUI when starting a 100% deck, the question "no cards" is shown!?
 - BUG: When an element from the home list is focussed, shortcuts don't work
-- FEATURE: GUI: Recursive search on the directory
-- FEATURE: Add option to load a Chinese / Japanese / Korean font (and
-create a bug to automate this choice when a deck/card is loaded based on the
-needed unicode).
 - BUG: when argument is a relative directory directory (`~` or `..`), it fails
+- FEATURE: GUI: Recursive search on the directory
 - FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
 - FEATURE: Complete help with about & licence

@@ -34,3 +34,9 @@ natural world.
 | Mausoleum at Halicarnassus   | Halicarnassus (Turkey) |
 | Colossus of Rhodes           | Greece                 |
 | Lighthouse of Alexandria     | Egypt                  |
+
+## How to say hello in Japanese, Korean and Chinese
+
+- Japanese: こんにちは (Konnichiwa)
+- Korean: 안녕하세요 (Annyeonghaseyo)
+- Traditional Chinese: 您好 (Nín hǎo)

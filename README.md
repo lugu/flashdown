@@ -58,7 +58,7 @@ Answer with a table.
 
 A GUI version for desktops and mobile (Android, iOS support isn't tested).
 
-> :warning: UTF-8 and Markdown tables are not yet supported.
+> :warning: Markdown tables are not yet supported.
 
 ![Screenshot](docs/essentialist-screenshot.png)
 

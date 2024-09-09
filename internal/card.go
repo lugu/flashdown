@@ -15,7 +15,7 @@ var (
 	errInvalidCard     = errors.New("Invalid card")
 )
 
-var splitQuestion = regexp.MustCompile(`(?m)^#\s*`)
+var splitQuestion = regexp.MustCompile(`(?m)^##\s*`)
 
 type Card struct {
 	Question string
@@ -100,8 +100,8 @@ func loadCard(md string) (c Card, err error) {
 	if len(sheets) != 2 {
 		return c, errInvalidCard
 	}
-	// Remove the '#' from the question.
-	c.Question = trim(sheets[0][1:])
+	// Remove the '##' from the question.
+	c.Question = trim(sheets[0][2:])
 	c.Answer = trim(sheets[1])
 	c.Meta = NewMeta(c)
 	return c, nil

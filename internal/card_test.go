@@ -8,12 +8,12 @@ import (
 
 func TestSplitDeck(t *testing.T) {
 	input := `
-# L1 cache reference
+## L1 cache reference
 0.5 ns
 
-#Branch mispredict
+##Branch mispredict
 5 ns
-# L2 cache reference
+## L2 cache reference
 
 7 ns,  14x L1 cache
 `
@@ -51,20 +51,20 @@ func TestSplitDeck(t *testing.T) {
 }
 
 func TestSplitCardWithCode(t *testing.T) {
-	template := `# Title 1
+	template := `## Title 1
 
 Text 1
 
-# Show me some code
+## Show me some code
 
 Some text
 
 %s
-# A comment
+## A comment
 Some code
 %s
 
-# Title 3
+## Title 3
 
 Text 3
 `
@@ -77,12 +77,12 @@ Text 3
 	if len(cards) != len(lines) {
 		t.Errorf("Each card should have a line: %d vs %d", len(cards), len(lines))
 	}
-	if cards[1] != fmt.Sprintf(`# Show me some code
+	if cards[1] != fmt.Sprintf(`## Show me some code
 
 Some text
 
 %s
-# A comment
+## A comment
 Some code
 %s
 `, "```", "```") {

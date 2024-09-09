@@ -1,4 +1,4 @@
-# Oldest known written language?
+## Oldest known written language?
 
 Sumerian language
 
@@ -6,14 +6,14 @@ Attested from c. 3000 BC. in mesopotamia (modern-day Iraq).
 
 Example: 𒄀𒆠𒌵𒆤  (E a ni): "her Temple"
 
-# Concept of **yin** and _yang_
+## Concept of **yin** and _yang_
 
 Yin & Yang
 : A concept of dualism, describing how seemingly opposite or contrary forces
 may actually be _complementary_, _interconnected_, and _interdependent_ in the
 natural world.
 
-# Examples of lost cities
+## Examples of lost cities
 
 - Atlantis
 - Aztlán
@@ -23,7 +23,7 @@ natural world.
 - Troy
 - [...]
 
-# 7 Wonders of the World
+## 7 Wonders of the World
 
 | **Wonder**                   | **Place**              |
 | ---------------------------- | ---------------------- |

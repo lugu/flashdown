@@ -33,9 +33,9 @@ func TestCreateDB(t *testing.T) {
 	}
 	defer os.Remove(file.Name())
 	_, err = file.Write([]byte(`
-# question 1
+## question 1
 answer 1
-# question 2
+## question 2
 answer 2
 `))
 	if err != nil {

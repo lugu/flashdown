@@ -22,7 +22,7 @@ Key features:
 Each deck of cards is a plain text Markdown files with the extension `.md` (ex:
 `sample.md`). You can put all your decks in the same directory.
 
-Each card starts with a heading level 1 (line starting with `#`) defining the
+Each card starts with a heading level 2 (line starting with `##`) defining the
 question. The answer is the content following (until the next heading level 1).
 
 You progress is stored in a hidden file `.<deck file>.db` (ex: `.sample.md.db`).
@@ -30,11 +30,11 @@ You progress is stored in a hidden file `.<deck file>.db` (ex: `.sample.md.db`).
 Example of a deck with 3 cards:
 
 ```markdown
-# Question: what format is used?
+## Question: what format is used?
 
 Questions and answers are in **Markdown**.
 
-# Are lists supported?
+## Are lists supported?
 
 Yes, here is an example:
 
@@ -42,7 +42,7 @@ Yes, here is an example:
 - **two**
 - three
 
-# How to include a table in the answer?
+## How to include a table in the answer?
 
 Answer with a table.
 

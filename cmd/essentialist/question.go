@@ -50,14 +50,6 @@ func space() fyne.CanvasObject {
 	return layout.NewSpacer()
 }
 
-// TODO: make the test selectable
-func card(md string) fyne.CanvasObject {
-	richText := widget.NewRichTextFromMarkdown(md)
-	width := richText.MinSize().Width
-	richText.Wrapping = fyne.TextWrapWord
-	return container.New(NewMaxWidthCenterLayout(width), richText)
-}
-
 type QuestionScreen struct {
 	game *flashdown.Game
 }
@@ -108,6 +100,14 @@ func (s *QuestionScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 			}
 		}
 	}
+}
+
+// TODO: make the test selectable
+func card(md string) fyne.CanvasObject {
+	richText := NewRichTextFromMarkdown(md)
+	width := richText.MinSize().Width
+	richText.Wrapping = fyne.TextWrapWord
+	return container.New(NewMaxWidthCenterLayout(width), richText)
 }
 
 func (s *QuestionScreen) Show(app Application) {

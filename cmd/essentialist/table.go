@@ -262,7 +262,7 @@ type (
 	TableCell            struct {
 		widget.BaseWidget
 		DummyRichTextSegment
-		provider *widget.RichText
+		content  *widget.RichText
 		renderer *cellRenderer
 	}
 	TableRow struct {
@@ -292,7 +292,7 @@ func (c *TableCell) CreateRenderer() fyne.WidgetRenderer {
 
 func NewTableCell(content *widget.RichText) *TableCell {
 	cell := &TableCell{
-		provider: content,
+		content:  content,
 		renderer: NewCellRenderer(content),
 	}
 	cell.ExtendBaseWidget(cell)
@@ -300,8 +300,8 @@ func NewTableCell(content *widget.RichText) *TableCell {
 }
 
 func (c *TableCell) updateSegment(content *widget.RichText) {
-	c.provider = content
-	c.renderer.setObject(c.provider)
+	c.content = content
+	c.renderer.setObject(c.content)
 	// c.renderer.Refresh()
 }
 
@@ -330,7 +330,7 @@ func NewTableSegment(rows []*TableRow) *TableSegment {
 				panic("Cannot create cell at col")
 			}
 			cell := o.(*TableCell)
-			cell.updateSegment(rows[pos.Row].cells[pos.Col].provider)
+			cell.updateSegment(rows[pos.Row].cells[pos.Col].content)
 		},
 	)
 	// FIXME: Headers used for troubleshooting. Delete them.

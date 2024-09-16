@@ -42,6 +42,7 @@
 - BUG: when argument is a relative directory directory (`~` or `..`), it fails
 - FEATURE: GUI: Recursive search on the directory
 - FEATURE: GUI: Text selectable
+- FEATURE: GUI: Support emoticon like :warning: and :rocket:.
 - FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
 - FEATURE: Complete help with about & licence
 

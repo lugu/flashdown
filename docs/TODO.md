@@ -41,6 +41,7 @@
 - BUG: When an element from the home list is focussed, shortcuts don't work
 - BUG: when argument is a relative directory directory (`~` or `..`), it fails
 - FEATURE: GUI: Recursive search on the directory
+- FEATURE: GUI: Text selectable
 - FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
 - FEATURE: Complete help with about & licence
 
@@ -93,7 +94,7 @@ The `Canvas.Refresh(CanvasObject)` method uses a refresh queue to store objects
 that need to be redrawn. A `Painter` is used to draw on the canvas.
 
 ```go
-func (p *painter) Paint(obj fyne.CanvasObject, 
+func (p *painter) Paint(obj fyne.CanvasObject,
                         pos fyne.Position,
                         frame fyne.Size) {
  if obj.Visible() {

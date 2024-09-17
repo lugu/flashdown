@@ -132,7 +132,6 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 	case *east.TableCell:
 		segs, err := renderChildren(source, n, true)
 		if err != nil {
-			panic("Failed to parse cell children") // FIXME: delete
 			return nil, err
 		}
 		if len(segs) != 1 {
@@ -143,7 +142,6 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 	case *east.TableHeader:
 		segs, err := renderChildren(source, n, true)
 		if err != nil {
-			panic("Failed to parse row") // FIXME: delete
 			return nil, err
 		}
 		cells := make([]*TableCell, len(segs))
@@ -158,7 +156,6 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 	case *east.TableRow:
 		segs, err := renderChildren(source, n, true)
 		if err != nil {
-			panic("Failed to parse row") // FIXME: delete
 			return nil, err
 		}
 		cells := make([]*TableCell, len(segs))
@@ -173,7 +170,6 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 	case *east.Table:
 		segs, err := renderChildren(source, n, blockquote)
 		if err != nil {
-			panic("Failed to parse table") // FIXME: delete
 			return nil, err
 		}
 		rows := make([]*TableRow, len(segs))
@@ -185,10 +181,6 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 			rows[i] = row
 		}
 		return []widget.RichTextSegment{NewTableSegment(rows)}, nil
-	}
-	fmt.Printf("===> n: %#v\n", n)
-	if n == nil {
-		fmt.Printf("===> n is nil!\n")
 	}
 	return nil, nil
 }
@@ -270,9 +262,10 @@ type (
 		cells []*TableCell
 	}
 	TableSegment struct {
+		widget.Table
 		DummyRichTextSegment
-		rows  []*TableRow
-		table *widget.Table
+		rows []*TableRow
+		size fyne.Size
 	}
 )
 
@@ -302,50 +295,85 @@ func NewTableCell(content *widget.RichText) *TableCell {
 func (c *TableCell) updateSegment(content *widget.RichText) {
 	c.content = content
 	c.renderer.setObject(c.content)
-	// c.renderer.Refresh()
 }
 
 func NewTableSegment(rows []*TableRow) *TableSegment {
-	// func NewTable(length func() (rows int, cols int), create func() fyne.CanvasObject, update func(TableCellID, fyne.CanvasObject)) *Table {
-	table := widget.NewTable(
-		func() (int, int) {
-			if len(rows) > 0 {
-				return len(rows), len(rows[0].cells)
-			}
-			return 0, 0
-		},
-		func() fyne.CanvasObject {
-			return NewTableCell(
-				widget.NewRichText(
-					&widget.TextSegment{
-						Style: widget.RichTextStyleCodeBlock,
-						Text:  "content is unknown yet",
-					}))
-		},
-		func(pos widget.TableCellID, o fyne.CanvasObject) {
-			if pos.Row >= len(rows) {
-				panic("Cannot create cell at row")
-			}
-			if pos.Col >= len(rows[pos.Row].cells) {
-				panic("Cannot create cell at col")
-			}
-			cell := o.(*TableCell)
-			cell.updateSegment(rows[pos.Row].cells[pos.Col].content)
-		},
-	)
-	// FIXME: Headers used for troubleshooting. Delete them.
-	table.ShowHeaderColumn = true
-	table.ShowHeaderRow = true
-	table.HideSeparators = false
-	return &TableSegment{
-		rows:  rows,
-		table: table,
+	length := func() (int, int) {
+		if len(rows) > 0 {
+			return len(rows), len(rows[0].cells)
+		}
+		return 0, 0
 	}
+	create := func() fyne.CanvasObject {
+		return NewTableCell(
+			widget.NewRichText(
+				&widget.TextSegment{
+					Style: widget.RichTextStyleCodeBlock,
+					Text:  "?",
+				}))
+	}
+	update := func(pos widget.TableCellID, o fyne.CanvasObject) {
+		if pos.Row >= len(rows) || pos.Col >= len(rows[pos.Row].cells) {
+			return
+		}
+		cell := o.(*TableCell)
+		cell.updateSegment(rows[pos.Row].cells[pos.Col].content)
+	}
+	table := &TableSegment{
+		Table: widget.Table{
+			Length:     length,
+			CreateCell: create,
+			UpdateCell: update,
+		},
+		rows: rows,
+	}
+	table.ExtendBaseWidget(table)
+	table.resize()
+	return table
+}
+
+func (l *TableSegment) resize() {
+	// Compute the size of the collumns
+	widths := []float32{}
+	heights := []float32{}
+	for i, row := range l.rows {
+		for j, cell := range row.cells {
+			width := cell.content.MinSize().Width
+			height := cell.content.MinSize().Height
+			if len(heights) < i+1 {
+				heights = append(heights, height)
+			} else if heights[i] < height {
+				heights[i] = height
+			}
+			if len(widths) < j+1 {
+				widths = append(widths, width)
+			} else if widths[j] < width {
+				widths[j] = width
+			}
+		}
+	}
+	l.size.Height = 0
+	for i, height := range heights {
+		l.SetRowHeight(i, height)
+		l.size.Height += height + 4
+	}
+	l.size.Width = 0
+	for j, width := range widths {
+		l.SetColumnWidth(j, width+8)
+		l.size.Width += width + 16
+	}
+}
+
+func (l *TableSegment) Unselect()                       { panic("not implemented") }
+func (l *TableSegment) Select(pos1, pos2 fyne.Position) { panic("not implemented") }
+func (l *TableSegment) SelectedText() string            { panic("not implemented") }
+func (l *TableSegment) MinSize() fyne.Size {
+	return l.size
 }
 
 // Visual returns the graphical elements required to render this segment.
 func (l *TableSegment) Visual() fyne.CanvasObject {
-	return l.table
+	return l
 }
 
 // Update applies the current state of this table segment to an existing visual.

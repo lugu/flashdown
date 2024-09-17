@@ -58,8 +58,6 @@ Answer with a table.
 
 A GUI version for desktops and mobile (Android, iOS support isn't tested).
 
-> :warning: Markdown tables are not yet supported.
-
 ![Screenshot](docs/essentialist-screenshot.png)
 
 ### Installation

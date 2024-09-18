@@ -134,10 +134,7 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 		if err != nil {
 			return nil, err
 		}
-		if len(segs) != 1 {
-			panic("More than one segment in a cell")
-		}
-		return []widget.RichTextSegment{NewTableCell(widget.NewRichText(segs[0]))}, nil
+		return []widget.RichTextSegment{NewTableCell(widget.NewRichText(segs...))}, nil
 
 	case *east.TableHeader:
 		segs, err := renderChildren(source, n, true)
@@ -255,7 +252,7 @@ type (
 		widget.BaseWidget
 		DummyRichTextSegment
 		content  *widget.RichText
-		renderer *cellRenderer
+		renderer cellRenderer
 	}
 	TableRow struct {
 		DummyRichTextSegment
@@ -333,7 +330,7 @@ func NewTableSegment(rows []*TableRow) *TableSegment {
 }
 
 func (l *TableSegment) resize() {
-	// Compute the size of the collumns
+	// Compute the size of the columns and rows
 	widths := []float32{}
 	heights := []float32{}
 	for i, row := range l.rows {
@@ -367,6 +364,8 @@ func (l *TableSegment) resize() {
 func (l *TableSegment) Unselect()                       { panic("not implemented") }
 func (l *TableSegment) Select(pos1, pos2 fyne.Position) { panic("not implemented") }
 func (l *TableSegment) SelectedText() string            { panic("not implemented") }
+
+// MinSize returns the table size otherwise is it minimzed.
 func (l *TableSegment) MinSize() fyne.Size {
 	return l.size
 }
@@ -379,40 +378,37 @@ func (l *TableSegment) Visual() fyne.CanvasObject {
 // Update applies the current state of this table segment to an existing visual.
 func (l *TableSegment) Update(o fyne.CanvasObject) {}
 
-// cellRenderer implements fyne.WidgetRenderer
-type cellRenderer struct {
-	// objects has exactly one object
-	objects []fyne.CanvasObject
+// cellRenderer implements fyne.WidgetRenderer. It contains exactly one canvas object.
+type cellRenderer []fyne.CanvasObject
+
+func NewCellRenderer(object fyne.CanvasObject) cellRenderer {
+	return cellRenderer([]fyne.CanvasObject{object})
 }
 
-func NewCellRenderer(object fyne.CanvasObject) *cellRenderer {
-	return &cellRenderer{[]fyne.CanvasObject{object}}
-}
-
-func (r *cellRenderer) setObject(object fyne.CanvasObject) {
-	r.objects[0] = object
+func (r cellRenderer) setObject(object fyne.CanvasObject) {
+	r[0] = object
 }
 
 // Destroy does nothing in this implementation.
-func (r *cellRenderer) Destroy() {
+func (r cellRenderer) Destroy() {
 }
 
 // Layout updates the contained object to be the requested size.
-func (r *cellRenderer) Layout(s fyne.Size) {
-	r.objects[0].Resize(s)
+func (r cellRenderer) Layout(s fyne.Size) {
+	r[0].Resize(s)
 }
 
 // MinSize returns the smallest size that this render can use, returned from the underlying object.
-func (r *cellRenderer) MinSize() fyne.Size {
-	return r.objects[0].MinSize()
+func (r cellRenderer) MinSize() fyne.Size {
+	return r[0].MinSize()
 }
 
 // Objects returns the objects that should be rendered.
-func (r *cellRenderer) Objects() []fyne.CanvasObject {
-	return r.objects
+func (r cellRenderer) Objects() []fyne.CanvasObject {
+	return r
 }
 
 // Refresh requests the underlying object to redraw.
-func (r *cellRenderer) Refresh() {
-	r.objects[0].Refresh()
+func (r cellRenderer) Refresh() {
+	r[0].Refresh()
 }

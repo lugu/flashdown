@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Essentialist
+Exec=~/go/bin/essentialist
+Icon=essentialist-icon.png
+Type=Application

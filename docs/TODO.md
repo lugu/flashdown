@@ -14,8 +14,8 @@
 -   [x] Document how to report bugs and features
 -   [x] GUI supports CJK option
 -   [x] GUI supports tables
+-   [x] Logo has been decided
 -   [ ] No usability bugs
--   [ ] Logo has been decided
 -   [ ] App tested on Android, Windows and Mac
 -   [ ] CI to create release from tag
 -   [ ] Release published with binaries

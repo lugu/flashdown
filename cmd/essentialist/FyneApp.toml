@@ -1,7 +1,7 @@
 Website = "https://github.com/lugu/flashdown"
 
 [Details]
-  Icon = "icon.png"
+  Icon = "essentialist-icon.png"
   Name = "Essentialist"
   ID = "com.github.lugu.flashdown"
   Version = "0.1.0"

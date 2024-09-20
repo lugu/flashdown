@@ -37,8 +37,7 @@
 
 -   BUG: GUI doesn't show the real number of cards in the deck
 -   BUG: GUI when starting a 100% deck, the question "no cards" is shown!?
--   BUG: GUI: Table indentation
--   BUG: GUI: Sub bullet not shown propertly (second level intendatin)
+-   BUG: GUI: Sub bullet not shown properly (second level indentation)
 -   BUG: When an element from the home list is focussed, shortcuts don't work
 -   BUG: when argument is a relative directory directory (`~` or `..`), it fails
 -   FEATURE: GUI: Recursive search on the directory

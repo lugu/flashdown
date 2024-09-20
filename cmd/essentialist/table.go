@@ -130,14 +130,14 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 		}
 		return []widget.RichTextSegment{&widget.ImageSegment{Source: u, Title: string(t.Title), Alignment: fyne.TextAlignCenter}}, nil
 	case *east.TableCell:
-		segs, err := renderChildren(source, n, true)
+		segs, err := renderChildren(source, n, blockquote)
 		if err != nil {
 			return nil, err
 		}
 		return []widget.RichTextSegment{NewTableCell(widget.NewRichText(segs...))}, nil
 
 	case *east.TableHeader:
-		segs, err := renderChildren(source, n, true)
+		segs, err := renderChildren(source, n, blockquote)
 		if err != nil {
 			return nil, err
 		}
@@ -151,7 +151,7 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 		}
 		return []widget.RichTextSegment{&TableRow{cells: cells}}, nil
 	case *east.TableRow:
-		segs, err := renderChildren(source, n, true)
+		segs, err := renderChildren(source, n, blockquote)
 		if err != nil {
 			return nil, err
 		}
@@ -302,12 +302,7 @@ func NewTableSegment(rows []*TableRow) *TableSegment {
 		return 0, 0
 	}
 	create := func() fyne.CanvasObject {
-		return NewTableCell(
-			widget.NewRichText(
-				&widget.TextSegment{
-					Style: widget.RichTextStyleCodeBlock,
-					Text:  "?",
-				}))
+		return NewTableCell(widget.NewRichText(&widget.TextSegment{}))
 	}
 	update := func(pos widget.TableCellID, o fyne.CanvasObject) {
 		if pos.Row >= len(rows) || pos.Col >= len(rows[pos.Row].cells) {

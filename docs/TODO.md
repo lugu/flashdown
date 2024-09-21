@@ -15,10 +15,10 @@
 -   [x] GUI supports CJK option
 -   [x] GUI supports tables
 -   [x] Logo has been decided
+-   [x] App tested on Android, Windows and Mac
+-   [x] CI to create release from tag
+-   [x] Release published with binaries
 -   [ ] No usability bugs
--   [ ] App tested on Android, Windows and Mac
--   [ ] CI to create release from tag
--   [ ] Release published with binaries
 -   [ ] Packages for flatpack or snap exists
 -   [ ] Arch AUR package
 

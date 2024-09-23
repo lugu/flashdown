@@ -38,7 +38,6 @@
 -   BUG: GUI doesn't show the real number of cards in the deck
 -   BUG: GUI: Sub bullet not shown properly (second level indentation)
 -   BUG: GUI: When an element from the home list is focussed, shortcuts don't work
--   BUG: GUI: 'q' doesn't work on error screen
 -   BUG: when argument is a relative directory directory (`~` or `..`), it fails
 -   FEATURE: GUI: Recursive search on the directory
 -   FEATURE: GUI: Text selectable

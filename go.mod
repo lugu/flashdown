@@ -30,5 +30,3 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	honnef.co/go/js/dom v0.0.0-20231112215516-51f43a291193 // indirect
 )
-
-replace fyne.io/fyne/v2 v2.5.1 => github.com/lugu/fyne/v2 v2.5.1

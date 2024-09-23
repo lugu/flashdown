@@ -27,6 +27,9 @@ const (
 	themeEntry     = "theme"
 )
 
+// overrideDirectory is used to specify a directory as an argument.
+var overrideDirectory = ""
+
 func getThemeName() string {
 	prefs := fyne.CurrentApp().Preferences()
 	return prefs.StringWithFallback("theme", "light")
@@ -79,10 +82,17 @@ func setRepetitionLenght(nbCards int) {
 	prefs.SetInt(cardsNbEntry, nbCards)
 }
 
-// getDirectory return the location where to look for decks.
+// getDirectory return the location where to look for decks. Set
+// overrideDirectory to select which directory is returned by getDirectory. If
+// overrideDirectory is unset, getDirectory returns the dirextory from the
+// settings.
 func getDirectory() fyne.URI {
-	a := fyne.CurrentApp()
-	prefs := a.Preferences()
+	if overrideDirectory != "" {
+		return storage.NewFileURI(overrideDirectory)
+	}
+
+	app := fyne.CurrentApp()
+	prefs := app.Preferences()
 	dir := prefs.StringWithFallback(directoryEntry, "")
 	if dir != "" {
 		uri, err := storage.ParseURI(dir)
@@ -93,8 +103,7 @@ func getDirectory() fyne.URI {
 	}
 	directory, err := makeDefaultDirectory()
 	if err != nil {
-		log.Printf("Failed to create %s", directory.String())
-		return a.Storage().RootURI()
+		return app.Storage().RootURI()
 	}
 	setDirectory(directory)
 	return directory
@@ -119,7 +128,7 @@ func newHelpTopBar(app Application) *fyne.Container {
 }
 
 func newErrorTopBar(app Application) *fyne.Container {
-	home := widget.NewButton("Home", func() {
+	home := widget.NewButton("Settings", func() {
 		app.Display(NewSettingsScreen())
 	})
 	return newTopBar("Error", home)
@@ -180,7 +189,8 @@ func forHuman(f fyne.URI) string {
 }
 
 func cleanDirectory() error {
-	files, err := storage.List(getDirectory())
+	dir := getDirectory()
+	files, err := storage.List(dir)
 	if err != nil {
 		return err
 	}
@@ -202,11 +212,10 @@ func importFile(source fyne.URI) error {
 	decoded, err := url.PathUnescape(source.Name())
 	filename := path.Base(decoded)
 
-	directory := getDirectory()
-	destination, err := storage.Child(directory, filename)
+	destination, err := storage.Child(getDirectory(), filename)
 	if err != nil {
 		return fmt.Errorf("Failed to create %s at %s, %s",
-			filename, directory.String(), err)
+			filename, getDirectory().String(), err)
 	}
 
 	err = storage.Copy(source, destination)

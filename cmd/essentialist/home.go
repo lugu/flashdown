@@ -60,7 +60,11 @@ func (s *HomeScreen) startQuickSession(app Application) {
 		app.Display(NewErrorScreen(err))
 		return
 	}
-	app.Display(NewQuestionScreen(game))
+	if game.IsFinished() {
+		app.Display(NewCongratsScreen(game))
+	} else {
+		app.Display(NewQuestionScreen(game))
+	}
 }
 
 func (s *HomeScreen) updateDeckButton(app Application, label *widget.Label, deck flashdown.DeckAccessor) *flashdown.Game {
@@ -96,7 +100,12 @@ func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 			s.games[i] = s.updateDeckButton(app, o.(*widget.Label), s.decks[i])
 		})
 	list.OnSelected = func(id widget.ListItemID) {
-		app.Display(NewQuestionScreen(s.games[id]))
+		game := s.games[id]
+		if game.IsFinished() {
+			app.Display(NewCongratsScreen(game))
+		} else {
+			app.Display(NewQuestionScreen(game))
+		}
 	}
 	return list
 }

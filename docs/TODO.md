@@ -35,7 +35,6 @@
 
 ## Unsorted TODO list
 
--   BUG: GUI shows a white bar next to the scoring buttons
 -   BUG: GUI doesn't show the real number of cards in the deck
 -   BUG: GUI: Sub bullet not shown properly (second level indentation)
 -   BUG: GUI: When an element from the home list is focussed, shortcuts don't work

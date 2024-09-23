@@ -162,7 +162,7 @@ func bottomButton(label string, cb func()) *fyne.Container {
 	rect.SetMinSize(fyne.NewSize(0, height))
 
 	return container.New(layout.NewBorderLayout(nil, nil, rect, nil),
-		rect, button)
+		button)
 }
 
 func continueButton(app Application, game *flashdown.Game) *fyne.Container {

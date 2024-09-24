@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"path"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -12,17 +11,18 @@ import (
 	flashdown "github.com/lugu/flashdown/internal"
 )
 
+// Warning: decks are loaded on demand by the list widget
 type HomeScreen struct {
-	decks   []flashdown.DeckAccessor
-	games   []*flashdown.Game
-	cardsNb int
+	accessors []flashdown.DeckAccessor
+	decks     []*flashdown.Deck
+	cardsNb   int
 }
 
-func NewHomeScreen(decks []flashdown.DeckAccessor) Screen {
+func NewHomeScreen(accessors []flashdown.DeckAccessor) Screen {
 	return &HomeScreen{
-		decks:   decks,
-		games:   make([]*flashdown.Game, len(decks)),
-		cardsNb: getRepetitionLenght(),
+		accessors: accessors,
+		decks:     make([]*flashdown.Deck, len(accessors)),
+		cardsNb:   getRepetitionLenght(),
 	}
 }
 
@@ -55,11 +55,20 @@ func (s *HomeScreen) keyHandler(app Application) func(*fyne.KeyEvent) {
 }
 
 func (s *HomeScreen) startQuickSession(app Application) {
-	game, err := flashdown.NewGameFromAccessors("all", s.cardsNb, s.decks...)
-	if err != nil {
-		app.Display(NewErrorScreen(err))
-		return
+	// We need to load remaning decks not yet loaded by by list widget.
+	decks := make([]*flashdown.Deck, 0, len(s.accessors))
+	for i, a := range s.accessors {
+		if s.decks[i] == nil {
+			deck, err := flashdown.NewDeck(a)
+			if err != nil {
+				s.decks[i] = deck
+				decks = append(decks, deck)
+			}
+		} else {
+			decks = append(decks, s.decks[i])
+		}
 	}
+	game := flashdown.NewGame(s.cardsNb, decks...)
 	if game.IsFinished() {
 		app.Display(NewCongratsScreen(game))
 	} else {
@@ -67,19 +76,15 @@ func (s *HomeScreen) startQuickSession(app Application) {
 	}
 }
 
-func (s *HomeScreen) updateDeckButton(app Application, label *widget.Label, deck flashdown.DeckAccessor) *flashdown.Game {
-	deckName := deck.DeckName()
-	game, err := flashdown.NewGameFromAccessors(deckName, s.cardsNb, deck)
-	if err != nil {
-		label.SetText(fmt.Sprintf("Failed to load %s: %s", deckName, err))
-		return nil
+func (s *HomeScreen) updateDeckButton(app Application, label *widget.Label, i int) {
+	deck := s.decks[i]
+	toReview, total := deck.Stats()
+	success := 100.0
+	if total != 0 {
+		success = 100 * ((float64(total) - float64(toReview)) / float64(total))
 	}
-	name := path.Base(game.Name())
-	current, total := game.Progress()
-	success := game.Success()
-	content := fmt.Sprintf("%s (%.0f%% - %d/%d)", name, success, current, total)
+	content := fmt.Sprintf("%s (%.0f%% of %d)", deck.Name, success, total)
 	label.SetText(content)
-	return game
 }
 
 func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
@@ -97,10 +102,20 @@ func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 			return widget.NewLabel("")
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			s.games[i] = s.updateDeckButton(app, o.(*widget.Label), s.decks[i])
+			label := o.(*widget.Label)
+			if s.decks[i] == nil { // lazy loading
+				var err error
+				s.decks[i], err = flashdown.NewDeck(s.accessors[i])
+				if err != nil {
+					label.SetText(fmt.Sprintf("Failed to load %s: %s",
+						s.accessors[i].DeckName(), err))
+					return
+				}
+			}
+			s.updateDeckButton(app, label, i)
 		})
 	list.OnSelected = func(id widget.ListItemID) {
-		game := s.games[id]
+		game := flashdown.NewGame(getRepetitionLenght(), s.decks[id])
 		if game.IsFinished() {
 			app.Display(NewCongratsScreen(game))
 		} else {

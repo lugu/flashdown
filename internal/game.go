@@ -8,7 +8,6 @@ import (
 type Game struct {
 	cards    []Card
 	decks    []*Deck
-	name     string
 	index    int
 	success  int
 	total    int
@@ -24,32 +23,14 @@ const (
 // represents the maximum number of cards to use.
 func NewGameFromFiles(cardsNb int, files []string) (*Game, error) {
 	decks := make([]*Deck, len(files))
-	name := ""
 	for i, file := range files {
 		deck, err := NewDeckFromFile(file)
 		if err != nil {
 			return nil, err
 		}
 		decks[i] = deck
-		if i != 0 {
-			name = name + " "
-		}
-		name = name + file
 	}
-	return NewGame(name, cardsNb, decks)
-}
-
-// NewGameFromFiles reads the markdown files to instantiate a Game.
-func NewGameFromAccessors(name string, cardsNb int, accessors ...DeckAccessor) (*Game, error) {
-	var decks []*Deck
-	for _, accessor := range accessors {
-		deck, err := NewDeck(accessor)
-		if err != nil {
-			return nil, err
-		}
-		decks = append(decks, deck)
-	}
-	return NewGame(name, cardsNb, decks)
+	return NewGame(cardsNb, decks...), nil
 }
 
 // NewGame returns a game given a set of markdown files.
@@ -58,11 +39,10 @@ func NewGameFromAccessors(name string, cardsNb int, accessors ...DeckAccessor) (
 // is CARDS_TO_REVIEW then all the cards that needs to be review will be uesd.
 // If cardsNb is a strictly positive number, up to cardsNb from the cards to
 // review will be used.
-func NewGame(name string, cardsNb int, decks []*Deck) (*Game, error) {
+func NewGame(cardsNb int, decks ...*Deck) *Game {
 	game := &Game{
 		cards: make([]Card, 0),
 		decks: decks,
-		name:  name,
 	}
 	for i, deck := range decks {
 		var cards []Card
@@ -80,7 +60,7 @@ func NewGame(name string, cardsNb int, decks []*Deck) (*Game, error) {
 	if cardsNb > 0 && len(game.cards) > cardsNb {
 		game.cards = game.cards[0:cardsNb]
 	}
-	return game, nil
+	return game
 }
 
 // Question returns the next question to answer. Idempotent.
@@ -176,8 +156,4 @@ func (g *Game) Save() {
 	for _, d := range g.decks {
 		defer d.SaveDeckMeta()
 	}
-}
-
-func (g *Game) Name() string {
-	return g.name
 }

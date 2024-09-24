@@ -1,6 +1,7 @@
 package flashdown
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -31,6 +32,7 @@ func (f *fileAccessor) metaFile() string {
 }
 
 func (f *fileAccessor) CardsReader() (io.ReadCloser, error) {
+	fmt.Println(f.filename)
 	return os.Open(f.filename)
 }
 

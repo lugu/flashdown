@@ -12,6 +12,7 @@ type MetaMap map[Digest]*Meta
 
 type Deck struct {
 	Cards      []Card
+	Name       string
 	MetaWriter func() (io.WriteCloser, error)
 }
 
@@ -88,7 +89,7 @@ func NewDeck(accessor DeckAccessor) (*Deck, error) {
 	}
 
 	deckName := accessor.DeckName()
-	for i, _ := range cards {
+	for i := range cards {
 		cards[i].DeckName = deckName
 		hash := Hash(cards[i])
 		meta, ok := metaMap[hash]
@@ -101,12 +102,12 @@ func NewDeck(accessor DeckAccessor) (*Deck, error) {
 
 	return &Deck{
 		Cards:      cards,
+		Name:       accessor.DeckName(),
 		MetaWriter: accessor.MetaWriter,
 	}, nil
 }
 
 func ShuffleCards(cards []Card) []Card {
-	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(cards), func(i, j int) { cards[i], cards[j] = cards[j], cards[i] })
 	return cards
 }
@@ -122,10 +123,20 @@ func (d *Deck) SelectBefore(now time.Time) []Card {
 	return cards
 }
 
-func (d *Deck) SaveDeckMeta() error {
+func (d *Deck) Stats() (toReview, total int) {
+	toReview = 0
+	now := time.Now()
+	for _, card := range d.Cards {
+		if card.Meta.NextTime.Before(now) {
+			toReview++
+		}
+	}
+	return toReview, len(d.Cards)
+}
 
+func (d *Deck) SaveDeckMeta() error {
 	metas := make([]Meta, len(d.Cards))
-	for i, _ := range d.Cards {
+	for i := range d.Cards {
 		metas[i] = *d.Cards[i].Meta
 	}
 	metaWriter, err := d.MetaWriter()

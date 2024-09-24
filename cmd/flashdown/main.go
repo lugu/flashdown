@@ -117,7 +117,7 @@ func main() {
 				if entry.IsDir() || path.Ext(entry.Name()) != ".md" {
 					continue
 				}
-				filename := path.Join(path.Base(file), entry.Name())
+				filename := path.Join(path.Dir(file), path.Base(file), entry.Name())
 				files = append(files, filename)
 			}
 		} else {

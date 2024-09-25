@@ -35,7 +35,6 @@
 
 ## Unsorted TODO list
 
-- BUG: GUI: Sub bullet not shown properly (second level indentation)
 - BUG: GUI: When an element from the home list is focussed, shortcuts don't work
 - FEATURE: GUI: Text selectable
 - FEATURE: GUI: Support emoticon like :warning: and :rocket:.

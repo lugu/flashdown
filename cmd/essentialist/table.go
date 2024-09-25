@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -58,8 +59,15 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 		return children, err
 	case *ast.List:
 		items, err := renderChildren(source, n, blockquote)
+		indentation := 0
+		for parent := n.Parent(); parent != nil; parent = parent.Parent() {
+			if _, ok := parent.(*ast.List); ok {
+				indentation++
+			}
+		}
 		return []widget.RichTextSegment{
-			&widget.ListSegment{Items: items, Ordered: t.Marker != '*' && t.Marker != '-' && t.Marker != '+'},
+			&widget.TextSegment{Style: widget.RichTextStyleParagraph, Text: ""},
+			&ListSegment{Items: items, IndentationLevel: indentation, Ordered: t.Marker != '*' && t.Marker != '-' && t.Marker != '+'},
 		}, err
 	case *ast.ListItem:
 		texts, err := renderChildren(source, n, blockquote)
@@ -406,4 +414,66 @@ func (r cellRenderer) Objects() []fyne.CanvasObject {
 // Refresh requests the underlying object to redraw.
 func (r cellRenderer) Refresh() {
 	r[0].Refresh()
+}
+
+// ListSegment includes an itemised list with the content set using the Items field.
+//
+// Since: 2.1
+type ListSegment struct {
+	Items            []widget.RichTextSegment
+	Ordered          bool
+	IndentationLevel int
+}
+
+// Inline returns false as a list should be in a block.
+func (l *ListSegment) Inline() bool {
+	return false
+}
+
+// Segments returns the segments required to draw bullets before each item
+func (l *ListSegment) Segments() []widget.RichTextSegment {
+	out := make([]widget.RichTextSegment, len(l.Items))
+	for i, in := range l.Items {
+		var txt string
+		for j := 0; j < l.IndentationLevel; j++ {
+			txt = txt + "\t"
+		}
+		txt = txt + "• "
+		if l.Ordered {
+			txt = strconv.Itoa(i+1) + "."
+		}
+		bullet := &widget.TextSegment{Text: txt + " ", Style: widget.RichTextStyleStrong}
+		out[i] = &widget.ParagraphSegment{Texts: []widget.RichTextSegment{
+			bullet,
+			in,
+		}}
+	}
+	return out
+}
+
+// Textual returns no content for a list as the content is in sub-segments.
+func (l *ListSegment) Textual() string {
+	return ""
+}
+
+// Visual returns no additional elements for this segment.
+func (l *ListSegment) Visual() fyne.CanvasObject {
+	return nil
+}
+
+// Update doesnt need to change a list visual.
+func (l *ListSegment) Update(fyne.CanvasObject) {
+}
+
+// Select does nothing for a list container.
+func (l *ListSegment) Select(_, _ fyne.Position) {
+}
+
+// SelectedText returns the empty string for this list.
+func (l *ListSegment) SelectedText() string {
+	return ""
+}
+
+// Unselect does nothing for a list container.
+func (l *ListSegment) Unselect() {
 }

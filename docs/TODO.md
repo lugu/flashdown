@@ -18,7 +18,7 @@
 - [x] App tested on Android, Windows and Mac
 - [x] CI to create release from tag
 - [x] Release published with binaries
-- [ ] No known bugs
+- [x] No known bugs
 - [ ] Packages for flatpack or snap exists
 - [ ] Arch AUR package
 

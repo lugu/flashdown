@@ -35,8 +35,6 @@
 
 ## Unsorted TODO list
 
-- BUG: GUI: When an element from the home list is focussed, shortcuts don't work
 - FEATURE: GUI: Text selectable
-- FEATURE: GUI: Support emoticon like :warning: and :rocket:.
 - FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
 - FEATURE: Complete help with about & licence

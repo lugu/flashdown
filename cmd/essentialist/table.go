@@ -12,6 +12,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/yuin/goldmark"
+	emoji "github.com/yuin/goldmark-emoji"
+	emoast "github.com/yuin/goldmark-emoji/ast"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/extension"
 	east "github.com/yuin/goldmark/extension/ast"
@@ -186,6 +188,9 @@ func renderNode(source []byte, n ast.Node, blockquote bool) ([]widget.RichTextSe
 			rows[i] = row
 		}
 		return []widget.RichTextSegment{NewTableSegment(rows)}, nil
+	case *emoast.Emoji:
+		text := string(t.Value.Unicode)
+		return []widget.RichTextSegment{&widget.TextSegment{Style: widget.RichTextStyleInline, Text: text}}, nil
 	}
 	return nil, nil
 }
@@ -245,7 +250,10 @@ func forceIntoHeadingText(source []byte, n ast.Node) string {
 func parseMarkdown(content string) []widget.RichTextSegment {
 	r := markdownRenderer{}
 	md := goldmark.New(
-		goldmark.WithExtensions(extension.Table),
+		goldmark.WithExtensions(
+			extension.Table,
+			emoji.Emoji,
+		),
 		goldmark.WithRenderer(&r))
 	err := md.Convert([]byte(content), nil)
 	if err != nil {

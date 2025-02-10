@@ -19,6 +19,7 @@
 -   [x] CI to create release from tag
 -   [x] Release published with binaries
 -   [x] No known bugs
+-   [ ] Add a quit button
 -   [ ] Packages for flatpack or snap exists
 -   [ ] Arch AUR package
 

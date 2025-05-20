@@ -107,6 +107,8 @@ func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 				var err error
 				s.decks[i], err = flashdown.NewDeck(s.accessors[i])
 				if err != nil {
+					s.decks[i] = flashdown.NewEmptyDeck(
+						s.accessors[i].DeckName())
 					label.SetText(fmt.Sprintf("Failed to load %s: %s",
 						s.accessors[i].DeckName(), err))
 					return

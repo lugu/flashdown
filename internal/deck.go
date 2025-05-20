@@ -73,6 +73,15 @@ func loadMetaMap(accessor DeckAccessor) (MetaMap, error) {
 }
 
 // NewDeckFromFile reads a Deck from a file.
+func NewEmptyDeck(name string) *Deck {
+	return &Deck{
+		Cards:      []Card{},
+		Name:       name,
+		MetaWriter: func() (io.WriteCloser, error) { return nil, fmt.Errorf("%", name) },
+	}
+}
+
+// NewDeckFromFile reads a Deck from a file.
 func NewDeckFromFile(filename string) (*Deck, error) {
 	return NewDeck(newFileDeckAccessor(filename))
 }

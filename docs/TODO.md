@@ -40,5 +40,3 @@
 -   FEATURE: GUI: Support for images in the question or the answer
 -   FEATURE: GUI: Text selectable
 -   FEATURE: Complete help with about & licence
--   FEATURE: GUI: Home with space left and right (center the list of deck)
-    vision.

@@ -99,7 +99,7 @@ func (s *HomeScreen) deckList(app Application) fyne.CanvasObject {
 			return len(s.decks)
 		},
 		func() fyne.CanvasObject {
-			return widget.NewLabel("")
+			return widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
 			label := o.(*widget.Label)

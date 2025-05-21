@@ -26,7 +26,7 @@
 ## App store launch milestone
 
 -   [ ] GUI supports binary mode (correct/incorrect)
--   [ ] Basic website at <https://essentialist.app>
+-   [x] Basic website at <https://essentialist.app>
 -   [ ] Ask feedback from 3 users at r/GetStudying and r/spacedrepetition/
 -   [ ] App tested on low end Android and different emulators
 -   [ ] Instructions to load and save cards from micro sd
@@ -36,9 +36,9 @@
 
 ## Unsorted TODO list
 
+-   FEATURE: Core: Implement FSRS
 -   FEATURE: GUI: Support for images in the question or the answer
 -   FEATURE: GUI: Text selectable
--   FEATURE: investigate <https://github.com/slaypni/SM-15/blob/master/sm.js>
 -   FEATURE: Complete help with about & licence
 -   FEATURE: GUI: Home with space left and right (center the list of deck)
     vision.

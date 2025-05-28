@@ -100,6 +100,9 @@ func loadCard(md string) (c Card, err error) {
 	if len(sheets) != 2 {
 		return c, errInvalidCard
 	}
+	if !strings.HasPrefix(sheets[0], "## ") {
+		return c, errInvalidCard
+	}
 	// Remove the '##' from the question.
 	c.Question = trim(sheets[0][2:])
 	c.Answer = trim(sheets[1])

@@ -259,7 +259,11 @@ func dbFile(file fyne.URI) (fyne.URI, error) {
 }
 
 func loadDecks() ([]flashdown.DeckAccessor, error) {
-	files, err := storage.List(getDirectory())
+	return loadDir(getDirectory())
+}
+
+func loadDir(dir fyne.URI) ([]flashdown.DeckAccessor, error) {
+	files, err := storage.List(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +280,15 @@ func loadDecks() ([]flashdown.DeckAccessor, error) {
 			if file == nil {
 				return
 			}
-			if file.Extension() != ".md" {
+			if file.Extension() != ".md" && file.Name() != dir.Name() {
+				println("%s", file.String())
+				accessors, err := loadDir(file)
+				if err != nil {
+					return
+				}
+				for _, a := range accessors {
+					results <- a
+				}
 				return
 			}
 
@@ -288,13 +300,19 @@ func loadDecks() ([]flashdown.DeckAccessor, error) {
 			results <- NewDeckAccessor(file, db)
 		}(file)
 	}
+
+	var wg2 sync.WaitGroup
+	wg2.Add(1)
+	accessors := make([]flashdown.DeckAccessor, 0)
+	go func() {
+		defer wg2.Done()
+		for accessor := range results {
+			accessors = append(accessors, accessor)
+		}
+	}()
 	wg.Wait()
 	close(results)
-
-	accessors := make([]flashdown.DeckAccessor, 0)
-	for accessor := range results {
-		accessors = append(accessors, accessor)
-	}
+	wg2.Wait()
 
 	select {
 	case err := <-errors:

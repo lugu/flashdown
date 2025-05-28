@@ -25,7 +25,7 @@ func loadCards(accessor DeckAccessor) ([]Card, error) {
 
 	cards, err := readCards(cardReader)
 	if err != nil {
-		return nil, fmt.Errorf("%v: %v", accessor.DeckName(), err)
+		return nil, err
 	}
 	return cards, nil
 }

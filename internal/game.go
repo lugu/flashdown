@@ -1,6 +1,7 @@
 package flashdown
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -26,7 +27,7 @@ func NewGameFromFiles(cardsNb int, files []string) (*Game, error) {
 	for i, file := range files {
 		deck, err := NewDeckFromFile(file)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to load %s: %v", file, err)
 		}
 		decks[i] = deck
 	}

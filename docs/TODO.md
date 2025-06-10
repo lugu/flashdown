@@ -7,7 +7,6 @@
 -   [x] Build instructions tested on Windows, Mac and Linux
 -   [x] Automate release publication using tags
 -   [x] Decision on the format: `#` vs `##`
--   [ ] Declare project at Google
 
 ## Distro launch milestone
 

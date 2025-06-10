@@ -77,7 +77,7 @@ func NewEmptyDeck(name string) *Deck {
 	return &Deck{
 		Cards:      []Card{},
 		Name:       name,
-		MetaWriter: func() (io.WriteCloser, error) { return nil, fmt.Errorf("%", name) },
+		MetaWriter: func() (io.WriteCloser, error) { return nil, fmt.Errorf("%s", name) },
 	}
 }
 

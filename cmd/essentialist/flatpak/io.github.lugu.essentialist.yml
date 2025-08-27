@@ -2,14 +2,15 @@ app-id: io.github.lugu.essentialist
 runtime: org.freedesktop.Platform
 runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
+sdk-extensions:
+    - org.freedesktop.Sdk.Extension.golang
 command: essentialist
 finish-args:
-  - --share=ipc # Share IPC namespace with the host (necessary for X11).
+  - --share=ipc       # Share IPC namespace with the host (necessary for X11).
   - --socket=x11
   - --socket=wayland
-  - --device=dri # OpenGL rendering support
+  - --device=dri      # OpenGL rendering support
   - --filesystem=home # Allow access to home directory
-  - --share=network
 build-options:
   env:
     - GOBIN=/app/bin
@@ -20,8 +21,6 @@ modules:
     build-commands:
       - $GOROOT/bin/go build -o essentialist ./cmd/essentialist
       - install -Dm00755 essentialist /app/bin/essentialist
-    build-depends:
-      - org.freedesktop.Sdk.Extension.golang
     sources:
       - type: git
         url: https://github.com/lugu/flashdown.git
@@ -961,11 +960,6 @@ modules:
         strip-components: 3
         type: archive
         url: https://proxy.golang.org/golang.org/x/exp/@v/v0.0.0-20200224162631-6cc2880d07d6.zip
-      - dest: vendor/golang.org/x/exp/shiny
-        sha256: 6f5079a683411666ba3a78301b1b244df620b8cb1315c682f486fe826da2f2bd
-        strip-components: 4
-        type: archive
-        url: https://proxy.golang.org/golang.org/x/exp/shiny/@v/v0.0.0-20230817173708-d852ddb80c63.zip
       - dest: vendor/golang.org/x/image
         sha256: d91e19d9c804398f168b69dfeb046942fe29bc65f803c2875d49c6de698f0d3e
         strip-components: 3

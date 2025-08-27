@@ -144,7 +144,10 @@ func newHomeTopBar(app Application, s *HomeScreen) *fyne.Container {
 	help := widget.NewButton("Help", func() {
 		app.Display(NewHelpScreen())
 	})
-	return newTopBar("Home", start, help, settings)
+	quit := widget.NewButton("Quit", func() {
+		app.Window().Close()
+	})
+	return newTopBar("Home", start, help, settings, quit)
 }
 
 func newProgressTopBar(app Application, game *flashdown.Game) *fyne.Container {

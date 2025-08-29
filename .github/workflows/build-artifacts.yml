@@ -32,6 +32,25 @@ jobs:
         name: Essentialist for Linux (amd64)
         path: ./essentialist-linux
 
+  build-for-linux-flatpak:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v4
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: essentialist.flatpak
+        manifest-path: cmd/essentialist/flatpak/io.github.lugu.essentialist.yml
+        cache-key: flatpak-builder-${{ github.sha }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Essentialist for Linux (flatpak)
+        path: ./essentialist.flatpak
+
   build-for-android:
     runs-on: ubuntu-latest
 

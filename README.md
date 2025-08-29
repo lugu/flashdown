@@ -142,3 +142,15 @@ flashdown <deck_file> [<deck_file>]
 ![Screenshot](docs/flashdown-screenshot.png)
 
 Similar project: <https://github.com/Yvee1/hascard>.
+
+## Maintenance
+
+### How to update dependencies
+
+```shell
+go get -u all
+go mod tidy
+go run github.com/dennwc/flatpak-go-mod@latest .
+mv modules.txt cmd/essentialist/flatpak/
+cat go.mod.yml >> cmd/essentialist/flatpak/io.github.lugu.essentialist.yml
+```
